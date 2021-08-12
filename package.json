@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "node .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/reecube/jira-time-in-status-crawler/issues"
   },
-  "homepage": "https://github.com/reecube/jira-time-in-status-crawler#readme"
+  "homepage": "https://github.com/reecube/jira-time-in-status-crawler#readme",
+  "dependencies": {
+    "dotenv": "^10.0.0"
+  }
 }
