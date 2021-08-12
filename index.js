@@ -1,17 +1,11 @@
 require('dotenv').config();
 
-const envValidator = {
-  JIRA_DOMAIN: 'string',
-  JIRA_VERSION: 'string',
-  JIRA_USERNAME: 'string',
-  JIRA_PASSWORD: 'string',
-};
+require('./lib/validator');
 
-for (const entry of Object.entries(envValidator)) {
-  const [key, type] = entry;
+const context = require('./lib/jira');
 
-  if (typeof process.env[key] !== type)
-    throw new Error(`Invalid type '${typeof process.env[key]}' for .env key '${key}'!`);
-}
+const crawl = require('./lib/crawl');
 
-console.log('YAY!');
+(async ()=> {
+  await crawl(context);
+})();
