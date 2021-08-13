@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "node .",
+    "crawl": "node . crawl",
+    "build": "node . build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
