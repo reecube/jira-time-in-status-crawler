@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "node .",
     "crawl": "node . crawl",
-    "build": "node . build",
+    "report:csv": "node . report:csv",
+    "report:html": "node . report:html",
+    "report:image": "node . report:image",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

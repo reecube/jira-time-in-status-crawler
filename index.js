@@ -2,33 +2,40 @@ require('dotenv').config();
 
 require('./lib/validator');
 
-const context = require('./lib/jira');
-const crawl = require("./lib/crawl");
+const context = require('./lib/context');
 
 const ACTION_CRAWL = 'crawl';
-const ACTION_BUILD = 'build';
+const ACTION_REPORT = 'report';
 
 const ACTIONS = [
   ACTION_CRAWL,
-  ACTION_BUILD,
+  ACTION_REPORT,
 ];
 
 (async () => {
-  const selectedAction = (process.argv[2] || '').toLowerCase();
+  const cliArgs = [...process.argv];
+
+  cliArgs.shift(); // Remove executable path
+  cliArgs.shift(); // Remove cwd
+
+  const args = (cliArgs.shift() || '').toLowerCase().split(':');
+
+  const selectedAction = args.shift();
 
   if (!ACTIONS.includes(selectedAction))
     return console.error(`Invalid action '${selectedAction}'! Please select one of: ${ACTIONS.join(', ')}`);
-
 
   switch (selectedAction) {
     case ACTION_CRAWL:
       const crawl = require('./lib/crawl');
 
-      return await crawl(context);
-    case ACTION_BUILD:
-      const build = require('./lib/build');
+      return await crawl(context, args, cliArgs);
+    case ACTION_REPORT:
+      const report = require('./lib/report');
 
-      return await build(context);
+      const type = args.shift();
+
+      return await report(context, type, args, cliArgs);
     default:
       throw new Error(`Unexpected action '${selectedAction}'!`);
   }
