@@ -20,7 +20,7 @@ export class Crawl extends BaseAction {
     while (true) {
       const response = await this.context.request('search', {
         jql: process.env.JIRA_JQL,
-        fields: 'issuekey,issuetype,status,created,updated,resolution,resolutiondate',
+        fields: 'issuekey,issuetype,status,created,updated,resolution,resolutiondate,priority',
         startAt: startAt,
         maxResults: 100,
       });
@@ -62,6 +62,10 @@ export class Crawl extends BaseAction {
           status: {
             id: respIssue.fields.status.id,
             name: respIssue.fields.status.name,
+          },
+          priority: {
+            id: respIssue.fields.priority.id,
+            name: respIssue.fields.priority.name,
           },
           created: issueCreated,
           updated: issueUpdated,
