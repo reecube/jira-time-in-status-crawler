@@ -1,16 +1,30 @@
 import { BaseAction } from './BaseAction';
 
-import { Loader } from '../support/Loader';
 import { Dictionary } from '../support/Types';
 
 export class Crawl extends BaseAction {
-
   readonly type: string = 'crawl';
 
-  async run(): Promise<void> {
-    const loader = new Loader();
+  private buildFields(): string {
+    const fields = [
+      'issuekey',
+      'issuetype',
+      'status',
+      'created',
+      'updated',
+      'resolution',
+      'resolutiondate',
+      'priority',
+      ...this.context.project.fields,
+    ];
 
-    loader.start(1, 0);
+    return fields.join(',');
+  }
+
+  async run(): Promise<void> {
+    this.context.loader.start(1, 0);
+
+    const fields = this.buildFields();
 
     const today = new Date(); // So all calculations will use the same date
 
@@ -20,12 +34,12 @@ export class Crawl extends BaseAction {
     while (true) {
       const response = await this.context.request('search', {
         jql: process.env.JIRA_JQL,
-        fields: 'issuekey,issuetype,status,created,updated,resolution,resolutiondate,priority',
+        fields: fields,
         startAt: startAt,
         maxResults: 100,
       });
 
-      loader.setTotal(response.total);
+      this.context.loader.setTotal(response.total);
 
       if (!Array.isArray(response.issues))
         throw new Error(`Issues missing on search response!`);
@@ -40,7 +54,7 @@ export class Crawl extends BaseAction {
             // TODO: solve this
             // console.log(`INFO: Load issue '${issueId}' from cache.`);
 
-            loader.increment(false);
+            this.context.loader.increment(false);
 
             continue;
           } else {
@@ -78,6 +92,9 @@ export class Crawl extends BaseAction {
           statusChanges: [],
           states: {},
         };
+
+        if (this.context.project.handleResponse)
+          this.context.project.handleResponse(respIssue, issue);
 
         issues[issueId] = issue;
 
@@ -153,7 +170,7 @@ export class Crawl extends BaseAction {
 
         this.context.writeOutput(issue.id, issue);
 
-        loader.increment();
+        this.context.loader.increment();
       }
 
       startAt += response.maxResults;
@@ -161,6 +178,6 @@ export class Crawl extends BaseAction {
       if (startAt >= response.total) break; // Exit loop
     }
 
-    loader.stop();
+    this.context.loader.stop();
   }
 }

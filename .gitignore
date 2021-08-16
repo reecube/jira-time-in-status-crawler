@@ -389,3 +389,5 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,linux,webstorm,intellij,node,yarn,dotenv
 
 /output/
+/projects/*
+!/projects/_template.js

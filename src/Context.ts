@@ -2,19 +2,27 @@ import * as fs from 'fs';
 
 import { Dictionary } from './support/Types';
 import { RequestHelper } from './support/RequestHelper';
+import { Loader } from './support/Loader';
+import { Project } from './model/Project';
 
 export class Context {
+  readonly project: Project;
+  readonly loader: Loader;
 
   private readonly basicAuthPlain = `${process.env.JIRA_USERNAME}:${process.env.JIRA_PASSWORD}`;
   private readonly basicAuth = Buffer.alloc(this.basicAuthPlain.length, this.basicAuthPlain).toString('base64');
   private readonly baseApiUrl = `https://${process.env.JIRA_DOMAIN}/rest/api/${process.env.JIRA_VERSION}/`;
-  private readonly outputGroup = (process.env.OUTPUT_NAME || 'default').replace(/\W/g, '');
 
   private readonly baseOutputPath = './output';
 
   private readonly authHeaders = {
     'Authorization': `Basic ${this.basicAuth}`,
   };
+
+  constructor(project: Project, loader: Loader) {
+    this.project = project;
+    this.loader = loader;
+  }
 
   private getOptions(method: string, custom: Dictionary<any> = {}): Dictionary<any> {
     return {
@@ -66,24 +74,24 @@ export class Context {
     return `(${entriesString}) ${postfix}`;
   };
 
-  private prepareGroupPath(group: string): string {
+  private prepareGroupPath(): string {
     if (!fs.existsSync(this.baseOutputPath)) fs.mkdirSync(this.baseOutputPath);
 
-    const groupPath = `${this.baseOutputPath}/${group}`;
+    const groupPath = `${this.baseOutputPath}/${this.project.name}`;
 
     if (!fs.existsSync(groupPath)) fs.mkdirSync(groupPath);
 
     return groupPath;
   };
 
-  private buildPath(group: string, id: string): string {
-    const groupPath = this.prepareGroupPath(group);
+  private buildPath(id: string): string {
+    const groupPath = this.prepareGroupPath();
 
     return `${groupPath}/${id}.json`;
   };
 
   readOutput(id: string): any {
-    const path = this.buildPath(this.outputGroup, id);
+    const path = this.buildPath(id);
 
     if (!fs.existsSync(path)) return null;
 
@@ -93,7 +101,7 @@ export class Context {
   };
 
   writeOutput(id: string, content: any): void {
-    const path = this.buildPath(this.outputGroup, id);
+    const path = this.buildPath(id);
 
     const json = JSON.stringify(content);
 
@@ -101,9 +109,7 @@ export class Context {
   };
 
   readAllOutput(mapper: ((input: any) => any)): Dictionary<any> {
-    const group = this.outputGroup;
-
-    const groupPath = this.prepareGroupPath(group);
+    const groupPath = this.prepareGroupPath();
 
     const result: Dictionary<any> = {};
 
@@ -119,7 +125,7 @@ export class Context {
       } catch (e) {
         console.error(e);
 
-        const path = this.buildPath(group, id);
+        const path = this.buildPath(id);
 
         fs.unlinkSync(path);
       }
@@ -143,11 +149,9 @@ export class Context {
   }
 
   prepareReportPath(report: string, file: string): string {
-    const group = this.outputGroup;
-
     if (!fs.existsSync(this.baseOutputPath)) fs.mkdirSync(this.baseOutputPath);
 
-    const groupPath = `${this.baseOutputPath}/${group}-reports`;
+    const groupPath = `${this.baseOutputPath}/${this.project.name}-reports`;
 
     if (!fs.existsSync(groupPath)) fs.mkdirSync(groupPath);
 
