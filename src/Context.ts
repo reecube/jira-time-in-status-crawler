@@ -210,6 +210,9 @@ export class Context {
       ...statusHeader,
     };
 
+    if (this.project.extendHeaderRow)
+      this.project.extendHeaderRow(headerRow);
+
     const normalizedData: Dictionary<any>[] = [
       headerRow,
     ];
@@ -235,6 +238,9 @@ export class Context {
       for (const statusId of statusIds) {
         row[makeStatusColId(statusId)] = localIssue.states[statusId] ? localIssue.states[statusId].duration : null;
       }
+
+      if (this.project.extendRow)
+        this.project.extendRow(row, localIssue);
 
       normalizedData.push(row);
     }

@@ -4,6 +4,12 @@ module.exports = {
     'TODO',
   ],
   handleResponse: (responseIssue, issue) => {
-    issue.TODO = responseIssue.TODO;
+    issue.customfield = responseIssue.TODO;
+  },
+  extendHeaderRow: (headerRow) => {
+    headerRow.customfield = 'TODO';
+  },
+  extendRow: (row, issue) => {
+    row.customfield = issue.customfield;
   },
 };
