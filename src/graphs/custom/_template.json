@@ -1,0 +1,8 @@
+{
+  "TODO": "READ BELOW",
+  "STEP1": "Make a new json file in the custom directoy",
+  "STEP2": "Either copy another grpah json file or go to https://vega.github.io/ and checkout how it works",
+  "STEP3": "Connect the graph and the data with your own project",
+  "STEP4": "Generate the graphs",
+  "STEP5": "Enjoy (or regret if the data is too bad)"
+}

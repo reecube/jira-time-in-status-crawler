@@ -391,3 +391,7 @@ $RECYCLE.BIN/
 /output/
 /src/projects/*
 !/src/projects/_*
+/src/graphs/custom/*
+!/src/graphs/custom/_*
+/src/vega-config/custom/*
+!/src/vega-config/custom/_*
