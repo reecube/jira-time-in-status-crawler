@@ -3,7 +3,8 @@ import * as fs from 'fs';
 import { Dictionary } from './support/Types';
 import { RequestHelper } from './support/RequestHelper';
 import { Loader } from './support/Loader';
-import { Project } from './model/Project';
+import { CollectionMapper, Project, PROJECT_VALUE_DEFAULT } from './model/Project';
+import { type } from 'os';
 
 export class Context {
   readonly project: Project;
@@ -167,29 +168,43 @@ export class Context {
   };
 
   mapIssueTable(localIssues: any[]): Dictionary<any>[] {
-    const statusMap: Dictionary<any> = {};
+    const collections: Dictionary<CollectionMapper> = {
+      states: (value: any, id: string): any => {
+        if (!value || value[id] === undefined) return PROJECT_VALUE_DEFAULT;
 
-    for (const localIssue of localIssues) {
-      for (const [id, state] of Object.entries(localIssue.states)) {
-        if (statusMap.hasOwnProperty(id)) continue;
+        return value[id].duration;
+      },
+      ...this.project.collections,
+    };
 
-        statusMap[id] = {
-          id: id,
-          name: (state as any).name,
-        };
+    const collectionMaps: Dictionary<Dictionary<any>> = {};
+    for (const collection of Object.keys(collections)) {
+      const collectionMap: Dictionary<any> = {};
+
+      for (const localIssue of localIssues) {
+        for (const entry of Object.values<any>(localIssue[collection])) {
+          const id = entry.id;
+
+          if (collectionMap.hasOwnProperty(id)) continue;
+
+          collectionMap[id] = {
+            id: entry.id,
+            name: entry.name,
+          };
+        }
       }
+
+      collectionMaps[collection] = collectionMap;
     }
 
-    const statusIds = Object.keys(statusMap);
+    const collectionsHeader: Dictionary<string> = {};
 
-    if (!statusIds.length) throw new Error(`Invalid input data with empty states!`);
+    const makeColId = (collection: string, statusId: string) => `${collection}${statusId}`;
 
-    const statusHeader: Dictionary<string> = {};
-
-    const makeStatusColId = (statusId: string) => `status${statusId}`;
-
-    for (const [statusId, status] of Object.entries(statusMap)) {
-      statusHeader[makeStatusColId(statusId)] = status.name;
+    for (const [collection, collectionMap] of Object.entries<any>(collectionMaps)) {
+      for (const [id, entry] of Object.entries<any>(collectionMap)) {
+        collectionsHeader[makeColId(collection, id)] = entry.name;
+      }
     }
 
     const headerRow: Dictionary<any> = {
@@ -207,11 +222,10 @@ export class Context {
       duration: 'Duration (ms)',
       resolutionId: 'Resolution Id',
       resolutionName: 'Resolution Name',
-      ...statusHeader,
+      ...collectionsHeader,
     };
 
-    if (this.project.extendHeaderRow)
-      this.project.extendHeaderRow(headerRow);
+    this.project.extendHeaderRow(headerRow);
 
     const normalizedData: Dictionary<any>[] = [
       headerRow,
@@ -235,12 +249,17 @@ export class Context {
         resolutionName: localIssue.resolution ? localIssue.resolution.name : null,
       };
 
-      for (const statusId of statusIds) {
-        row[makeStatusColId(statusId)] = localIssue.states[statusId] ? localIssue.states[statusId].duration : null;
+      for (const [collection, collectionMap] of Object.entries<any>(collectionMaps)) {
+        for (const entryId of Object.keys(collectionMap)) {
+          const value = localIssue[collection];
+
+          const mapper = collections[collection];
+
+          row[makeColId(collection, entryId)] = mapper(value, entryId);
+        }
       }
 
-      if (this.project.extendRow)
-        this.project.extendRow(row, localIssue);
+      this.project.extendRow(row, localIssue);
 
       normalizedData.push(row);
     }

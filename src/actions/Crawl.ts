@@ -15,6 +15,7 @@ export class Crawl extends BaseAction {
       'resolution',
       'resolutiondate',
       'priority',
+      'assignee',
       ...this.context.project.fields,
     ];
 

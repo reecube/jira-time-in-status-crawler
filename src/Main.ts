@@ -1,13 +1,11 @@
-import * as fs from 'fs';
-
 import { Dictionary } from './support/Types';
 import { Context } from './Context';
 import { Crawl } from './actions/Crawl';
 import { Report } from './actions/Report';
 import { BaseAction } from './actions/BaseAction';
 import { Project } from './model/Project';
-import { PathHelper } from './support/PathHelper';
 import { Loader } from './support/Loader';
+import { Projects } from './projects/Projects';
 
 const stringValidator = (value: any) => typeof value === 'string' && value.length;
 
@@ -20,8 +18,6 @@ const envValidator: Dictionary<any> = {
 };
 
 export class Main {
-  private readonly basePathProjects = './projects';
-
   private readonly loader = new Loader();
 
   validate(): void {
@@ -33,44 +29,35 @@ export class Main {
     }
   }
 
-  private loadProjects(): Project[] {
-    const projects: Project[] = [];
-
-    const files = fs.readdirSync(this.basePathProjects);
-
-    for (const file of files) {
-      const ext = PathHelper.getExtension(file);
-
-      if (ext !== 'js') continue;
-
-      const name = PathHelper.getBasename(file);
-
-      if (name === '_template') continue;
-
-      const project: Project = require(`../${this.basePathProjects}/${file}`);
-
-      (project as any).name = name;
-
-      projects.push(project);
-    }
-
-    return projects;
-  }
-
   async run(): Promise<void> {
     const args = [...process.argv];
 
     args.shift(); // Remove executable path
     args.shift(); // Remove cwd
 
-    const projects = this.loadProjects();
-    const project = projects[0];
+    const selectedProject = args.shift() || '';
 
-    if (!project) throw new Error(`Empty project not supported!`);
+    if (!selectedProject) throw new Error(`Empty project not supported!`);
 
     const selectedAction = (args.shift() || '').toLowerCase();
 
     if (!selectedAction) throw new Error(`Empty action not supported!`);
+
+    const projects = Projects.get();
+
+    if (!projects.length) throw new Error(`Empty projects not supported!`);
+
+    let project: Project | false = false;
+
+    for (const entry of projects) {
+      if (entry.name !== selectedProject) continue;
+
+      project = entry;
+
+      break;
+    }
+
+    if (!project) throw new Error(`Unknown project name '${selectedProject}'!`);
 
     const context = new Context(project, this.loader);
 
