@@ -25,4 +25,4 @@ TODO
 
 Please check out the node modules for library credits.
 
-This tool was created by Yves Riedener. 
+This tool was created by Yves Riedener.
