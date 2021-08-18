@@ -34,7 +34,7 @@ export class Crawl extends BaseAction {
     let startAt = 0;
     while (true) {
       const response = await this.context.request('search', {
-        jql: process.env.JIRA_JQL,
+        jql: this.context.project.jql,
         fields: fields,
         startAt: startAt,
         maxResults: 100,

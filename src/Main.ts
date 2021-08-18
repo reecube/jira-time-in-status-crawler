@@ -14,7 +14,6 @@ const envValidator: Dictionary<any> = {
   JIRA_VERSION: stringValidator,
   JIRA_USERNAME: stringValidator,
   JIRA_PASSWORD: stringValidator,
-  JIRA_JQL: stringValidator,
 };
 
 export class Main {
