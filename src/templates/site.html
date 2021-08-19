@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }}</title>
+  <style>
+    template {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  window.loadConfig = (id) => {
+    const template = document.getElementById(id);
+
+    const json = template.innerHTML.trim();
+
+    return JSON.parse(json);
+  };
+  window.charts = {};
+</script>
+
+<div>
+  {{ charts }}
+</div>
+</body>
+</html>

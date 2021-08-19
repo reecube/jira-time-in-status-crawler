@@ -69,7 +69,7 @@ export class Main {
       if (action.type === selectedAction) return await action.run();
     }
 
-    throw new Error(`Unknown report type '${selectedAction}'!`);
+    throw new Error(`Unknown action '${selectedAction}'!`);
   }
 
   stop() {

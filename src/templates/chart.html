@@ -1,0 +1,9 @@
+<h2>{{ title }}</h2>
+<canvas id="chart-{{ id }}"></canvas>
+<template id="template-{{ id }}">{{ config }}</template>
+<script>
+  window.charts['{{ id }}'] = new Chart(
+    document.getElementById('chart-{{ id }}'),
+    window.loadConfig('template-{{ id }}')
+  );
+</script>

@@ -2,8 +2,7 @@ import { BaseAction } from './BaseAction';
 
 import { BaseReport } from '../report/BaseReport';
 import { ReportCsv } from '../report/ReportCsv';
-import { ReportHtml } from '../report/ReportHtml';
-import { ReportImage } from '../report/ReportImage';
+import { ReportChart } from '../report/ReportChart';
 
 export class Report extends BaseAction {
 
@@ -12,8 +11,7 @@ export class Report extends BaseAction {
   async run(): Promise<void> {
     const generators: BaseReport[] = [
       new ReportCsv(this.context, this.args),
-      new ReportHtml(this.context, this.args),
-      new ReportImage(this.context, this.args),
+      new ReportChart(this.context, this.args),
     ];
 
     const type = this.args[0]?.toLowerCase();
