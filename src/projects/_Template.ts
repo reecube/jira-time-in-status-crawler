@@ -1,4 +1,4 @@
-import { Issue, Project, PROJECT_VALUE_DEFAULT, Row } from '../model/Project';
+import { ChartSite, Issue, Project, PROJECT_VALUE_DEFAULT, Row } from '../model/Project';
 import { _TemplateChart } from '../charts/_TemplateChart';
 
 export class _Template implements Project {
@@ -16,8 +16,10 @@ export class _Template implements Project {
       return value[id].TODO;
     },
   };
-  charts = [
-    new _TemplateChart(),
+  chartSites = [
+    new ChartSite([
+      new _TemplateChart()
+    ], 'todo', 'TODO'),
   ];
 
   handleResponse(responseIssue: Issue, issue: Issue): void {

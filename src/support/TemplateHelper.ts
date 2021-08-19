@@ -17,7 +17,7 @@ export abstract class TemplateHelper {
     let html = fs.readFileSync(path).toString();
 
     for (const [key, value] of Object.entries<string>(context)) {
-      const regex = new RegExp(`\{\{\s*${key}\s*\}\}`, 'g');
+      const regex = new RegExp(`\{\{\\s*${key.replace(/\W+/g,'')}\\s*\}\}`, 'g');
 
       const replacement = TemplateHelper.convertToString(value);
 

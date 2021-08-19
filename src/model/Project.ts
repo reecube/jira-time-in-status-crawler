@@ -44,12 +44,27 @@ export abstract class Chart {
   }
 }
 
+export class ChartSite {
+
+  readonly charts: Chart[];
+
+  readonly name: string;
+
+  readonly title: string;
+
+  constructor(charts: Chart[], name: string, title: string = '') {
+    this.charts = charts;
+    this.name = name;
+    this.title = title;
+  }
+}
+
 export interface Project {
   readonly name: string;
   readonly jql: string;
   readonly fields: string[];
   readonly collections: Dictionary<CollectionMapper>;
-  readonly charts: Chart[];
+  readonly chartSites: ChartSite[];
 
   handleResponse(responseIssue: Issue, issue: Issue): void;
 

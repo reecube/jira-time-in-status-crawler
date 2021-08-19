@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+
 import { BaseReport } from './BaseReport';
 import { TemplateHelper } from '../support/TemplateHelper';
 
@@ -12,23 +14,27 @@ export class ReportChart extends BaseReport {
 
     const chartHtmls = [];
 
-    for (const chart of this.context.project.charts) {
-      const chartConfig = chart.buildConfig(issueTable);
+    for (const chartSite of this.context.project.chartSites) {
+      for (const chart of chartSite.charts) {
+        const chartConfig = chart.buildConfig(issueTable);
 
-      const chartHtml = TemplateHelper.load('chart', {
-        id: chart.id,
-        title: chart.title,
-        config: chartConfig,
+        const chartHtml = TemplateHelper.load('chart', {
+          id: chart.id,
+          title: chart.title,
+          config: chartConfig,
+        });
+
+        chartHtmls.push(chartHtml);
+      }
+
+      const siteHtml = TemplateHelper.load('site', {
+        title: chartSite.title,
+        charts: chartHtmls.join('\n'),
       });
 
-      chartHtmls.push(chartHtml);
+      const path = this.context.prepareReportPath(this.type, `${chartSite.name}.html`);
+
+      fs.writeFileSync(path, siteHtml);
     }
-
-    const siteHtml = TemplateHelper.load('site', {
-      title: 'TODO', // FIXME
-      charts: chartHtmls.join('\n'),
-    });
-
-    // TODO: write siteHtml
   }
 }
