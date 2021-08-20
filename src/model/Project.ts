@@ -16,12 +16,9 @@ export interface ChartConfig {
 }
 
 export abstract class Chart {
-  readonly title: string;
-
   readonly id: string;
 
   constructor(options: Dictionary<any> = {}) {
-    this.title = options.title || '';
     this.id = options.id || GeneralHelper.makeId();
   }
 
@@ -32,7 +29,9 @@ export abstract class Chart {
   protected abstract mapData(data: any): ChartConfig
 
   protected getOptions(): Dictionary<any> {
-    return {};
+    return {
+      responsive: false,
+    };
   }
 
   buildConfig(data: any): Dictionary<any> {
@@ -52,10 +51,16 @@ export class ChartSite {
 
   readonly title: string;
 
-  constructor(charts: Chart[], name: string, title: string = '') {
+  readonly layoutCols: number;
+
+  readonly layoutRows: number;
+
+  constructor(charts: Chart[], name: string, options: Dictionary<any> = {}) {
     this.charts = charts;
     this.name = name;
-    this.title = title;
+    this.title = options.title || '';
+    this.layoutCols = options.layoutCols || 2;
+    this.layoutRows = options.layoutRows || 2;
   }
 }
 

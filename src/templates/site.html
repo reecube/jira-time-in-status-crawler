@@ -4,14 +4,94 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ title }}</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      padding: 2rem 0.5rem 0.5rem;
+
+      font-family: sans-serif;
+
+      color: #111;
+      background: #eee;
+    }
+
     template {
       display: none !important;
     }
+
+    h1 {
+      text-align: center;
+    }
+
+    .charts {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: center;
+      align-items: center;
+      align-content: center;
+    }
+
+    .chart {
+      margin: 1%;
+      border-radius: 0.3rem;
+      padding: 1rem;
+
+      box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.1);
+
+      background: #fff;
+
+      overflow: hidden;
+    }
+
+    body[data-cols="1"] .chart {
+      flex-basis: 98%;
+    }
+
+    body[data-cols="2"] .chart {
+      flex-basis: 48%;
+    }
+
+    body[data-cols="3"] .chart {
+      flex-basis: 31%;
+    }
+
+    body[data-cols="4"] .chart {
+      flex-basis: 23%;
+    }
+
+    body[data-cols="5"] .chart {
+      flex-basis: 18%;
+    }
+
+    .credits {
+      margin: 3rem 0;
+
+      font-size: .875rem;
+      text-align: center;
+    }
+
+    .credits a {
+      text-decoration: none;
+      color: #00897b;
+    }
+
+    @media print {
+      body[data-cols="3"] .chart,
+      body[data-cols="4"] .chart,
+      body[data-cols="5"] .chart {
+        flex-basis: 98% !important;
+      }
+    }
   </style>
 </head>
-<body>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<body data-cols="{{ layoutCols }}" data-rows="{{ layoutRows }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2/dist/chartjs-plugin-annotation.min.js"></script>
 <script>
   window.loadConfig = (id) => {
     const template = document.getElementById(id);
@@ -20,11 +100,33 @@
 
     return JSON.parse(json);
   };
+
   window.charts = {};
+
+  const resizeAllCharts = (w = undefined, h = undefined) => {
+    Object.values(window.charts).forEach(it => it.resize(w, h));
+  };
+
+  const onResizeAllCharts = () => {
+    resizeAllCharts();
+  };
+
+  window.addEventListener('resize', onResizeAllCharts);
+  window.addEventListener('beforeprint', () => {
+    const printSize = (document.body.getAttribute('data-cols') === '2') ? 320 : 700;
+    resizeAllCharts(printSize, printSize / 2);
+  });
+  window.addEventListener('afterprint', onResizeAllCharts);
+  window.addEventListener('load', onResizeAllCharts);
 </script>
 
-<div>
+<h1>{{ title }}</h1>
+<div class="charts">
   {{ charts }}
 </div>
+<p class="credits copyright">
+  generated with <strong>♥</strong> by
+  <a href="https://www.reecube.com" target="_blank">Yves Riedener</a>
+</p>
 </body>
 </html>

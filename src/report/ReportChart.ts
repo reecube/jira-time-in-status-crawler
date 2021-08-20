@@ -12,15 +12,14 @@ export class ReportChart extends BaseReport {
 
     const issueTable = this.context.mapIssueTable(localIssues);
 
-    const chartHtmls = [];
-
     for (const chartSite of this.context.project.chartSites) {
+      const chartHtmls = [];
+
       for (const chart of chartSite.charts) {
         const chartConfig = chart.buildConfig(issueTable);
 
         const chartHtml = TemplateHelper.load('chart', {
           id: chart.id,
-          title: chart.title,
           config: chartConfig,
         });
 
@@ -30,6 +29,8 @@ export class ReportChart extends BaseReport {
       const siteHtml = TemplateHelper.load('site', {
         title: chartSite.title,
         charts: chartHtmls.join('\n'),
+        layoutCols: chartSite.layoutCols,
+        layoutRows: chartSite.layoutRows,
       });
 
       const path = this.context.prepareReportPath(this.type, `${chartSite.name}.html`);

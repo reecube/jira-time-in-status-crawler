@@ -18,8 +18,10 @@ export class _Template implements Project {
   };
   chartSites = [
     new ChartSite([
-      new _TemplateChart()
-    ], 'todo', 'TODO'),
+      new _TemplateChart(),
+    ], 'todo', {
+      title: 'IS24 Dashboard',
+    }),
   ];
 
   handleResponse(responseIssue: Issue, issue: Issue): void {
