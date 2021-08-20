@@ -2,6 +2,8 @@ import * as fs from 'fs';
 
 import { BaseReport } from './BaseReport';
 import { TemplateHelper } from '../support/TemplateHelper';
+import { Dictionary } from '../support/Types';
+import { GeneralHelper } from '../support/GeneralHelper';
 
 export class ReportChart extends BaseReport {
 
@@ -10,7 +12,15 @@ export class ReportChart extends BaseReport {
   async run(): Promise<void> {
     const localIssues = Object.values(this.context.readAllOutputIssues());
 
-    const chartSites = this.context.project.buildChartSites(localIssues);
+    const options = {
+      states: {},
+    };
+
+    for (const issue of localIssues) {
+      GeneralHelper.addToCollection(Object.values(issue.states), options.states);
+    }
+
+    const chartSites = this.context.project.buildChartSites(localIssues, options);
 
     for (const chartSite of chartSites) {
       const chartHtmls = [];

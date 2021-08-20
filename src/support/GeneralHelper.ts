@@ -1,3 +1,5 @@
+import { Dictionary } from './Types';
+
 const CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 export abstract class GeneralHelper {
@@ -13,5 +15,19 @@ export abstract class GeneralHelper {
     }
 
     return result.join('');
+  }
+
+  static addToCollection(ref: any, collection: Dictionary<string>) {
+    if (!ref) return;
+
+    if (!Array.isArray(ref)) {
+      collection[ref.id] = ref.name;
+
+      return;
+    }
+
+    for (const entry of ref) {
+      this.addToCollection(entry, collection);
+    }
   }
 }

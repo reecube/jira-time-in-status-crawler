@@ -20,26 +20,60 @@ export interface ChartConfig {
 export abstract class Chart {
   readonly id: string;
 
+  protected readonly colors: string[];
+
+  protected colorRequest = 0;
+
+  protected readonly options: Dictionary<any>;
+
   constructor(options: Dictionary<any> = {}) {
     this.id = options.id || GeneralHelper.makeId();
+    this.colors = options.colors || [
+      'red',
+      'orange',
+      'yellow',
+      'green',
+      'blue',
+    ];
+    this.options = options;
+  }
+
+  protected nextColor(): string {
+    const color = this.colors[this.colorRequest % this.colors.length];
+
+    this.colorRequest += 1;
+
+    return color;
   }
 
   protected getChartType(): string {
     return 'line';
   }
 
-  protected abstract mapData(data: any): ChartConfig
+  protected abstract mapData(issues: Issue[]): ChartConfig
+
+  protected getTitle(): string {
+    return '';
+  }
 
   protected getOptions(): Dictionary<any> {
+    const title = this.getTitle();
+
     return {
       responsive: false,
+      plugins: {
+        title: {
+          display: !!title,
+          text: title,
+        },
+      },
     };
   }
 
-  buildConfig(data: any): Dictionary<any> {
+  buildConfig(issues: Issue[]): Dictionary<any> {
     return {
       type: this.getChartType(),
-      data: this.mapData(data),
+      data: this.mapData(issues),
       options: this.getOptions(),
     };
   }
@@ -72,7 +106,7 @@ export interface Project {
   readonly fields: string[];
   readonly collections: Dictionary<CollectionMapper>;
 
-  buildChartSites(data: any): ChartSite[]
+  buildChartSites(issues: Issue[], options: Dictionary<any>): ChartSite[];
 
   handleResponse(responseIssue: ResponseIssue, issue: Issue): void;
 

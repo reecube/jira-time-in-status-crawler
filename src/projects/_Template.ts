@@ -1,6 +1,7 @@
 import { ChartSite, ResponseIssue, Project, PROJECT_VALUE_DEFAULT, Row, CustomIssue } from '../model/Project';
 import { Issue } from '../model/Issue';
 import { _TemplateChart } from '../charts/_TemplateChart';
+import { Dictionary } from '../support/Types';
 
 export class _Template implements Project {
   name = 'TODO';
@@ -18,10 +19,10 @@ export class _Template implements Project {
     },
   };
 
-  buildChartSites(data: any): ChartSite[] {
+  buildChartSites(issues: Issue[], options: Dictionary<any>): ChartSite[] {
     return [
       new ChartSite([
-        new _TemplateChart(),
+        new _TemplateChart(options),
       ], 'todo', {
         title: 'IS24 Dashboard',
       }),

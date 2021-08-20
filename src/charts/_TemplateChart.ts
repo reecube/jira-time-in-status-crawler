@@ -1,8 +1,14 @@
 import { Chart, ChartConfig } from '../model/Project';
+import { Issue } from '../model/Issue';
 
 export class _TemplateChart extends Chart {
-  protected mapData(data: any): ChartConfig {
-    const headerRow = Object.keys(data.shift());
+
+  protected getTitle(): string {
+    return 'TODO';
+  }
+
+  protected mapData(issues: Issue[]): ChartConfig {
+    const headerRow = Object.keys(issues.shift());
 
     return {
       labels: Object.values(headerRow),

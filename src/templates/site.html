@@ -80,10 +80,38 @@
     }
 
     @media print {
-      body[data-cols="3"] .chart,
-      body[data-cols="4"] .chart,
-      body[data-cols="5"] .chart {
-        flex-basis: 98% !important;
+      .charts {
+        display: block;
+      }
+
+      .charts:after {
+        content: '';
+
+        display: block;
+
+        clear: both;
+      }
+
+      .chart {
+        page-break-inside: avoid;
+
+        float: left;
+        display: inline-block;
+
+        margin: 1%;
+        border: 1px solid #444;
+
+        width: 48%;
+
+        box-shadow: initial;
+
+        flex-basis: initial !important;
+      }
+
+      body[data-cols="1"] .chart {
+        margin: 1% 0;
+
+        width: 100%;
       }
     }
   </style>
@@ -92,6 +120,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
 <script
   src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2/dist/chartjs-plugin-annotation.min.js"></script>
+
 <script>
   window.loadConfig = (id) => {
     const template = document.getElementById(id);
@@ -113,7 +142,7 @@
 
   window.addEventListener('resize', onResizeAllCharts);
   window.addEventListener('beforeprint', () => {
-    const printSize = (document.body.getAttribute('data-cols') === '2') ? 320 : 700;
+    const printSize = (document.body.getAttribute('data-cols') === '2') ? 320 : 650;
     resizeAllCharts(printSize, printSize / 2);
   });
   window.addEventListener('afterprint', onResizeAllCharts);
