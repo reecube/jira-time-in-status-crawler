@@ -2,7 +2,6 @@ import { Dictionary } from '../support/Types';
 import { GeneralHelper } from '../support/GeneralHelper';
 import { Issue } from './Issue';
 import { ChartHelper, CustomIssuePreparation } from '../support/ChartHelper';
-import { config } from 'dotenv';
 
 export const PROJECT_VALUE_DEFAULT = null;
 export const PROJECT_BOOLEAN_TRUE = 'true';
@@ -104,17 +103,27 @@ export class ChartSite {
   }
 }
 
-export interface Project {
-  readonly name: string;
-  readonly jql: string;
-  readonly fields: string[];
-  readonly collections: Dictionary<CollectionMapper>;
+export abstract  class Project {
+  abstract readonly name: string;
+  abstract readonly jql: string;
+  abstract readonly fields: string[];
+  abstract readonly collections: Dictionary<CollectionMapper>;
 
-  buildChartSites(issues: Issue[], options: Dictionary<any>): ChartSite[];
+  filter(issues: Issue[]): Issue[] {
+    return issues;
+  }
 
-  handleResponse(responseIssue: ResponseIssue, issue: Issue): void;
+  abstract buildChartSites(issues: Issue[], options: Dictionary<any>): ChartSite[];
 
-  extendHeaderRow(headerRow: Row): void;
+  handleResponse(responseIssue: ResponseIssue, issue: Issue): void {
+    // Do nothing
+  }
 
-  extendRow(row: Row, issue: CustomIssue): void;
+  extendHeaderRow(headerRow: Row): void {
+    // Do nothing
+  }
+
+  extendRow(row: Row, issue: CustomIssue): void {
+    // Do nothing
+  }
 }

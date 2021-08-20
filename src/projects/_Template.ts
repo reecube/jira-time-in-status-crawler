@@ -3,7 +3,7 @@ import { Issue } from '../model/Issue';
 import { _TemplateChart } from '../charts/_TemplateChart';
 import { Dictionary } from '../support/Types';
 
-export class _Template implements Project {
+export class _Template extends Project {
   name = 'TODO';
   jql = 'project IN (TODO) AND type IN (TODO)';
   fields = [

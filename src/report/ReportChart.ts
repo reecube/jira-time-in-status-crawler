@@ -2,7 +2,6 @@ import * as fs from 'fs';
 
 import { BaseReport } from './BaseReport';
 import { TemplateHelper } from '../support/TemplateHelper';
-import { Dictionary } from '../support/Types';
 import { GeneralHelper } from '../support/GeneralHelper';
 
 export class ReportChart extends BaseReport {
@@ -10,7 +9,9 @@ export class ReportChart extends BaseReport {
   readonly type: string = 'chart';
 
   async run(): Promise<void> {
-    const localIssues = Object.values(this.context.readAllOutputIssues());
+    const localIssues = this.context.project.filter(
+      Object.values(this.context.readAllOutputIssues()),
+    );
 
     const options = {
       states: {},

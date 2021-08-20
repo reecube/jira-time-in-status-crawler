@@ -6,7 +6,6 @@ import { DateHelper } from './DateHelper';
 import { ChartConfig } from '../model/Project';
 import { Issue } from '../model/Issue';
 import { GeneralHelper } from './GeneralHelper';
-import { parseInt } from 'lodash';
 
 export const PERIOD_SECOND = 1000;
 
