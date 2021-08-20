@@ -1,6 +1,7 @@
 import { Dictionary } from '../support/Types';
 import { GeneralHelper } from '../support/GeneralHelper';
 import { Issue } from './Issue';
+import { ChartHelper, CustomIssuePreparation } from '../support/ChartHelper';
 
 export const PROJECT_VALUE_DEFAULT = null;
 export const PROJECT_BOOLEAN_TRUE = 'true';
@@ -20,37 +21,21 @@ export interface ChartConfig {
 export abstract class Chart {
   readonly id: string;
 
-  protected readonly colors: string[];
-
-  protected colorRequest = 0;
-
   protected readonly options: Dictionary<any>;
+
+  protected readonly helper: ChartHelper;
+
+  protected readonly customPreparation?: CustomIssuePreparation = undefined;
 
   constructor(options: Dictionary<any> = {}) {
     this.id = options.id || GeneralHelper.makeId();
-    this.colors = options.colors || [
-      'red',
-      'orange',
-      'yellow',
-      'green',
-      'blue',
-    ];
     this.options = options;
-  }
-
-  protected nextColor(): string {
-    const color = this.colors[this.colorRequest % this.colors.length];
-
-    this.colorRequest += 1;
-
-    return color;
+    this.helper = new ChartHelper(this.options);
   }
 
   protected getChartType(): string {
     return 'line';
   }
-
-  protected abstract mapData(issues: Issue[]): ChartConfig
 
   protected getTitle(): string {
     return '';
@@ -71,10 +56,23 @@ export abstract class Chart {
     };
   }
 
+  protected getStateIds(): any[] {
+    return [];
+  }
+
   buildConfig(issues: Issue[]): Dictionary<any> {
+    const grouped = this.helper.prepareIssues(issues, this.customPreparation);
+
+    const groupedValues = this.helper.reduce(grouped, this.getStateIds());
+
+    const chartConfig =  this.helper.makeOverviewChartConfig(
+      this.helper.makeMonthLabels(groupedValues.length),
+      groupedValues,
+    );
+
     return {
       type: this.getChartType(),
-      data: this.mapData(issues),
+      data: chartConfig,
       options: this.getOptions(),
     };
   }

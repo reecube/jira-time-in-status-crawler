@@ -1,5 +1,4 @@
-import { Chart, ChartConfig } from '../model/Project';
-import { Issue } from '../model/Issue';
+import { Chart } from '../model/Project';
 
 export class _TemplateChart extends Chart {
 
@@ -7,20 +6,16 @@ export class _TemplateChart extends Chart {
     return 'TODO';
   }
 
-  protected mapData(issues: Issue[]): ChartConfig {
-    const headerRow = Object.keys(issues.shift());
+  protected getChartType(): string {
+    return 'bar';
+  }
 
-    return {
-      labels: Object.values(headerRow),
-      datasets: [
-        {
-          label: 'TODO',
-          data: [65, 59, 80, 81, 56, 55, 40],
-          fill: false,
-          borderColor: 'rgb(75, 192, 192)',
-          tension: 0.1,
-        },
-      ],
-    };
+  protected getStateIds(): any[] {
+    return this.options.stateIds || [
+      1,
+      2,
+      3,
+      // TODO
+    ];
   }
 }
