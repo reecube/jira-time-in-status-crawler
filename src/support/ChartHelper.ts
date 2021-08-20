@@ -159,17 +159,16 @@ export class ChartHelper {
     issues: Issue[],
     custom: CustomIssuePreparation = {},
   ): Dictionary<Issue[]> {
-    const nowDate = new Date();
-    const now = nowDate.getTime();
-
     const days = this.options.days || 180;
 
     const timePeriod = days * PERIOD_DAY;
 
+    const firstValidDate = DateHelper.getMonthStart(timePeriod);
+
     const filtered = issues.filter((issue) => {
       if (!issue.resolved) return false;
 
-      if ((now - issue.resolved.getTime()) > timePeriod) return false;
+      if (issue.resolved.getTime() < firstValidDate) return false;
 
       if (!custom.filter) return true;
 

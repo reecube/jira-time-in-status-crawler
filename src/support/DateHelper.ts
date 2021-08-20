@@ -7,4 +7,18 @@ export abstract class DateHelper {
 
     return result;
   }
+
+  static getMonthStart(timePeriod: number): number {
+    const now = new Date().getTime();
+
+    const firstOfMonth = new Date(now - timePeriod);
+
+    firstOfMonth.setDate(1);
+    firstOfMonth.setHours(0);
+    firstOfMonth.setMinutes(0);
+    firstOfMonth.setSeconds(0);
+    firstOfMonth.setMilliseconds(0);
+
+    return firstOfMonth.getTime();
+  }
 }
