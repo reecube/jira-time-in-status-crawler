@@ -103,20 +103,14 @@
         float: left;
         display: inline-block;
 
-        margin: 1%;
+        margin: 1% 0;
         border: 1px solid #444;
 
-        width: 48%;
+        width: 100%;
 
         box-shadow: initial;
 
         flex-basis: initial !important;
-      }
-
-      body[data-cols="1"] .chart {
-        margin: 1% 0;
-
-        width: 100%;
       }
     }
   </style>
@@ -138,7 +132,7 @@
   window.charts = {};
 
   const resizeAllCharts = () => {
-    const printSize = (document.body.getAttribute('data-cols') === '2') ? 320 : 650;
+    const printSize = 650;
 
     const w = window.printMode ? printSize : undefined;
     const h = window.printMode ? printSize : undefined;

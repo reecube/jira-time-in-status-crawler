@@ -2,6 +2,7 @@ import { Dictionary } from '../support/Types';
 import { GeneralHelper } from '../support/GeneralHelper';
 import { Issue } from './Issue';
 import { ChartHelper, CustomIssuePreparation } from '../support/ChartHelper';
+import { config } from 'dotenv';
 
 export const PROJECT_VALUE_DEFAULT = null;
 export const PROJECT_BOOLEAN_TRUE = 'true';
@@ -65,15 +66,19 @@ export abstract class Chart {
 
     const groupedValues = this.helper.reduce(grouped, this.getStateIds());
 
-    const chartConfig =  this.helper.makeOverviewChartConfig(
+    const chartConfig = this.helper.makeOverviewChartConfig(
       this.helper.makeMonthLabels(groupedValues.length),
       groupedValues,
     );
 
+    const options = this.getOptions();
+
+    this.helper.addAnnotations(options, chartConfig);
+
     return {
       type: this.getChartType(),
       data: chartConfig,
-      options: this.getOptions(),
+      options: options,
     };
   }
 }

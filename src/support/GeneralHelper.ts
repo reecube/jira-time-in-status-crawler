@@ -30,4 +30,16 @@ export abstract class GeneralHelper {
       this.addToCollection(entry, collection);
     }
   }
+
+  static getReferenceByPath(path: string | string[], input: Dictionary<any>): Dictionary<any> {
+    if (typeof path === 'string') path = path.split('.');
+
+    const key = path.shift();
+
+    if (typeof key !== 'string') return input;
+
+    if (typeof input[key] !== 'object') input[key] = {};
+
+    return this.getReferenceByPath(path, input[key]);
+  }
 }

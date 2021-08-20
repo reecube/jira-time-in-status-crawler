@@ -4,6 +4,7 @@ import { ChartConfig } from '../model/Project';
 import * as stats from 'simple-statistics';
 import * as _ from 'lodash';
 import { Issue } from '../model/Issue';
+import { GeneralHelper } from './GeneralHelper';
 
 export const PERIOD_SECOND = 1000;
 
@@ -179,5 +180,60 @@ export class ChartHelper {
       labels,
       datasets,
     };
+  }
+
+  addAnnotations(options: Dictionary<any>, chartConfig: ChartConfig): void {
+    const ref = GeneralHelper.getReferenceByPath('plugins.annotation.annotations', options);
+
+    for (const dataset of chartConfig.datasets) {
+      const color = dataset.backgroundColor || dataset.borderColor || dataset.color;
+
+      let counter = 0;
+      const lr = stats.linearRegression(dataset.data.map((y: number) => [counter++, y]));
+      const lrl = stats.linearRegressionLine(lr);
+
+      ref[GeneralHelper.makeId()] = {
+        drawTime: 'beforeDraw',
+        type: 'line',
+        yMin: Math.max(0, lrl(0)),
+        yMax: Math.max(0, lrl(dataset.data.length - 1)),
+        borderColor: color,
+        borderWidth: 1,
+      };
+    }
+
+    const goal = this.options.goal;
+
+    if (goal) {
+      const isNumber = typeof goal === 'number';
+
+      const yMin = isNumber ? goal : goal.min;
+      const yMax = isNumber ? goal : goal.max;
+
+      const backgroundColor = this.options.goalColor || 'rgba(0,0,0,0.5)';
+      const color = this.options.goalTextColor || '#fff';
+
+      const label = this.options.goalLabel || `Goal ${isNumber ? goal : `${yMin} - ${yMax}`}`;
+
+      ref[GeneralHelper.makeId()] = {
+        drawTime: 'afterDraw',
+        type: 'line',
+        yMin: yMin,
+        yMax: yMax,
+        borderColor: backgroundColor,
+        borderWidth: 2,
+        label: {
+          enabled: true,
+          content: label,
+          backgroundColor,
+          color,
+          font: {
+            family: 'sans-serif',
+            size: 8,
+            style: 'normal',
+          },
+        },
+      };
+    }
   }
 }
