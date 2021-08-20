@@ -1,10 +1,12 @@
+import * as stats from 'simple-statistics';
+import * as _ from 'lodash';
+
 import { Dictionary } from './Types';
 import { DateHelper } from './DateHelper';
 import { ChartConfig } from '../model/Project';
-import * as stats from 'simple-statistics';
-import * as _ from 'lodash';
 import { Issue } from '../model/Issue';
 import { GeneralHelper } from './GeneralHelper';
+import { parseInt } from 'lodash';
 
 export const PERIOD_SECOND = 1000;
 
@@ -26,6 +28,82 @@ export const PERIOD_QUARTER_THREE = PERIOD_MONTH * 9;
 
 export const PERIOD_YEAR = PERIOD_MONTH * 12;
 
+export const COLOR_SCHEMES: Dictionary<string[]> = (() => {
+  const result: Dictionary<string[]> = {};
+
+  const materialColors = require('material-colors');
+
+  for (const [name, colors] of Object.entries<any>(materialColors)) {
+    if (!colors['50'] || !colors['100']) continue;
+
+    result[name] = [
+      colors['500'],
+      colors['700'],
+      colors['900'],
+      colors['100'],
+      colors['300'],
+      colors['600'],
+      colors['100'],
+      colors['800'],
+      colors['400'],
+      colors['50'],
+    ];
+  }
+
+  const getColors = (colorKeys: string [], intensityKey: string): string[] => {
+    return colorKeys.map((colorKey: string) => materialColors[colorKey][intensityKey]);
+  };
+
+  const rainbowColors = [
+    'red',
+    'pink',
+    'purple',
+    'deepPurple',
+    'indigo',
+    'blue',
+    'lightBlue',
+    'cyan',
+    'teal',
+    'green',
+    'lightGreen',
+    'lime',
+    'yellow',
+    'amber',
+    'orange',
+    'deepOrange',
+  ];
+
+  result.rainbow = getColors(rainbowColors, '500');
+  result.rainbowreversed = getColors(rainbowColors.reverse(), '500');
+  result.smooth = getColors([
+    'blue',
+    'cyan',
+    'green',
+    'lime',
+    'amber',
+    'deepOrange',
+    'pink',
+    'deepPurple',
+    'lightBlue',
+    'lightGreen',
+    'orange',
+    'red',
+    'purple',
+    'indigo',
+    'teal',
+    'yellow',
+  ], '500');
+  result.visible = getColors([
+    'purple',
+    'blue',
+    'green',
+    'amber',
+    'red',
+  ], '500');
+
+  return result;
+})();
+
 export interface CustomIssuePreparation {
   filter?: (issue: Issue) => boolean;
   sort?: (a: Issue, b: Issue) => number;
@@ -41,13 +119,7 @@ export class ChartHelper {
 
   constructor(options: Dictionary<any> = {}) {
     this.options = options;
-    this.colors = options.colors || [
-      'red',
-      'orange',
-      'yellow',
-      'green',
-      'blue',
-    ];
+    this.colors = options.colors || COLOR_SCHEMES.visible;
   }
 
   nextColor(): string {
