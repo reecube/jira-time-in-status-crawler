@@ -85,6 +85,11 @@
     }
 
     @media print {
+      body, main {
+        margin: 0;
+        padding: 0;
+      }
+
       .charts {
         display: block;
       }
@@ -111,6 +116,10 @@
         box-shadow: initial;
 
         flex-basis: initial !important;
+      }
+
+      .credits {
+        margin: 1rem 0;
       }
     }
   </style>
