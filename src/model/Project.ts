@@ -1,11 +1,13 @@
 import { Dictionary } from '../support/Types';
 import { GeneralHelper } from '../support/GeneralHelper';
+import { Issue } from './Issue';
 
 export const PROJECT_VALUE_DEFAULT = null;
 export const PROJECT_BOOLEAN_TRUE = 'true';
 export const PROJECT_BOOLEAN_FALSE = 'false';
 
-export type Issue = Dictionary<any>;
+export type ResponseIssue = Dictionary<any>;
+export type CustomIssue = Dictionary<any>;
 export type Row = Dictionary<any>;
 
 export type CollectionMapper = (value: any, id: string) => any;
@@ -69,11 +71,12 @@ export interface Project {
   readonly jql: string;
   readonly fields: string[];
   readonly collections: Dictionary<CollectionMapper>;
-  readonly chartSites: ChartSite[];
 
-  handleResponse(responseIssue: Issue, issue: Issue): void;
+  buildChartSites(data: any): ChartSite[]
+
+  handleResponse(responseIssue: ResponseIssue, issue: Issue): void;
 
   extendHeaderRow(headerRow: Row): void;
 
-  extendRow(row: Row, issue: Issue): void;
+  extendRow(row: Row, issue: CustomIssue): void;
 }

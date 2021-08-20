@@ -5,6 +5,7 @@ import { RequestHelper } from './support/RequestHelper';
 import { Loader } from './support/Loader';
 import { CollectionMapper, Project, PROJECT_VALUE_DEFAULT } from './model/Project';
 import { type } from 'os';
+import { Issue } from './model/Issue';
 
 export class Context {
   readonly project: Project;
@@ -109,7 +110,7 @@ export class Context {
     fs.writeFileSync(path, json);
   };
 
-  readAllOutput(mapper: ((input: any) => any)): Dictionary<any> {
+  readAllOutput(mapper: ((input: Dictionary<any>) => Issue)): Dictionary<Issue> {
     const groupPath = this.prepareGroupPath();
 
     const result: Dictionary<any> = {};
@@ -135,8 +136,8 @@ export class Context {
     return result;
   };
 
-  readAllOutputIssues(): Dictionary<any> {
-    return this.readAllOutput(entry => {
+  readAllOutputIssues(): Dictionary<Issue> {
+    return this.readAllOutput((entry) => {
       entry.created = new Date(entry.created);
       entry.updated = new Date(entry.updated);
       entry.resolved = entry.resolved ? new Date(entry.resolved) : null;
@@ -145,7 +146,7 @@ export class Context {
         statusChange.date = new Date(statusChange.date);
       }
 
-      return entry;
+      return entry as Issue;
     });
   }
 
@@ -167,7 +168,7 @@ export class Context {
     return `${reportPath}/${file}`;
   };
 
-  mapIssueTable(localIssues: any[]): Dictionary<any>[] {
+  mapIssueTable(localIssues: Issue[]): Dictionary<any>[] {
     const collections: Dictionary<CollectionMapper> = {
       states: (value: any, id: string): any => {
         if (!value || value[id] === undefined) return PROJECT_VALUE_DEFAULT;
@@ -182,7 +183,7 @@ export class Context {
       const collectionMap: Dictionary<any> = {};
 
       for (const localIssue of localIssues) {
-        for (const entry of Object.values<any>(localIssue[collection])) {
+        for (const entry of Object.values<any>((localIssue as any)[collection])) {
           const id = entry.id;
 
           if (collectionMap.hasOwnProperty(id)) continue;
@@ -251,7 +252,7 @@ export class Context {
 
       for (const [collection, collectionMap] of Object.entries<any>(collectionMaps)) {
         for (const entryId of Object.keys(collectionMap)) {
-          const value = localIssue[collection];
+          const value = (localIssue as any)[collection];
 
           const mapper = collections[collection];
 

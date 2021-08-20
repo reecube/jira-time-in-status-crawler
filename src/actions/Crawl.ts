@@ -1,6 +1,7 @@
 import { BaseAction } from './BaseAction';
 
 import { Dictionary } from '../support/Types';
+import { Issue } from '../model/Issue';
 
 export class Crawl extends BaseAction {
   readonly type: string = 'crawl';
@@ -29,7 +30,7 @@ export class Crawl extends BaseAction {
 
     const today = new Date(); // So all calculations will use the same date
 
-    const issues = this.context.readAllOutputIssues();
+    const issues: Dictionary<Issue> = this.context.readAllOutputIssues();
 
     let startAt = 0;
     while (true) {
@@ -67,7 +68,7 @@ export class Crawl extends BaseAction {
         const issueCreated = new Date(respIssue.fields.created);
         const issueResolved = respIssue.fields.resolutiondate ? new Date(respIssue.fields.resolutiondate) : null;
 
-        const issue: Dictionary<any> = {
+        const issue: Issue = {
           id: respIssue.id,
           key: respIssue.key,
           type: {

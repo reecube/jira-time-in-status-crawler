@@ -10,13 +10,13 @@ export class ReportChart extends BaseReport {
   async run(): Promise<void> {
     const localIssues = Object.values(this.context.readAllOutputIssues());
 
-    const issueTable = this.context.mapIssueTable(localIssues);
+    const chartSites = this.context.project.buildChartSites(localIssues);
 
-    for (const chartSite of this.context.project.chartSites) {
+    for (const chartSite of chartSites) {
       const chartHtmls = [];
 
       for (const chart of chartSite.charts) {
-        const chartConfig = chart.buildConfig(issueTable);
+        const chartConfig = chart.buildConfig(localIssues);
 
         const chartHtml = TemplateHelper.load('chart', {
           id: chart.id,

@@ -2,7 +2,7 @@ import { Chart, ChartConfig } from '../model/Project';
 
 export class _TemplateChart extends Chart {
   protected mapData(data: any): ChartConfig {
-    const headerRow = data.shift();
+    const headerRow = Object.keys(data.shift());
 
     return {
       labels: Object.values(headerRow),
