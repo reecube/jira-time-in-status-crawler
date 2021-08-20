@@ -23,6 +23,11 @@
       display: none !important;
     }
 
+    main {
+      margin: 0 auto;
+      max-width: 1200px;
+    }
+
     h1 {
       text-align: center;
     }
@@ -132,30 +137,38 @@
 
   window.charts = {};
 
-  const resizeAllCharts = (w = undefined, h = undefined) => {
+  const resizeAllCharts = () => {
+    const printSize = (document.body.getAttribute('data-cols') === '2') ? 320 : 650;
+
+    const w = window.printMode ? printSize : undefined;
+    const h = window.printMode ? printSize : undefined;
+
     Object.values(window.charts).forEach(it => it.resize(w, h));
   };
 
-  const onResizeAllCharts = () => {
-    resizeAllCharts();
-  };
-
-  window.addEventListener('resize', onResizeAllCharts);
+  window.addEventListener('resize', resizeAllCharts);
   window.addEventListener('beforeprint', () => {
-    const printSize = (document.body.getAttribute('data-cols') === '2') ? 320 : 650;
-    resizeAllCharts(printSize, printSize / 2);
+    window.printMode = true;
+
+    resizeAllCharts();
   });
-  window.addEventListener('afterprint', onResizeAllCharts);
-  window.addEventListener('load', onResizeAllCharts);
+  window.addEventListener('afterprint', () => {
+    window.printMode = false;
+
+    resizeAllCharts();
+  });
+  window.addEventListener('load', resizeAllCharts);
 </script>
 
-<h1>{{ title }}</h1>
-<div class="charts">
-  {{ charts }}
-</div>
-<p class="credits copyright">
-  generated with <strong>♥</strong> by
-  <a href="https://www.reecube.com" target="_blank">Yves Riedener</a>
-</p>
+<main>
+  <h1>{{ title }}</h1>
+  <div class="charts">
+    {{ charts }}
+  </div>
+  <p class="credits copyright">
+    generated with <strong>♥</strong> by
+    <a href="https://www.reecube.com" target="_blank">Yves Riedener</a>
+  </p>
+</main>
 </body>
 </html>

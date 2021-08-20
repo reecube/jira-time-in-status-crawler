@@ -61,6 +61,7 @@ export abstract class Chart {
 
     return {
       responsive: false,
+      aspectRatio: 1.5,
       plugins: {
         title: {
           display: !!title,
