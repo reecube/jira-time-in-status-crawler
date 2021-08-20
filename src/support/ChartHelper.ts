@@ -157,7 +157,7 @@ export class ChartHelper {
 
   prepareIssues(
     issues: Issue[],
-    custom: CustomIssuePreparation = {},
+    custom: CustomIssuePreparation,
   ): Dictionary<Issue[]> {
     const days = this.options.days || 180;
 

@@ -18,14 +18,12 @@ export interface ChartConfig {
   readonly datasets: Dictionary<any>[];
 }
 
-export abstract class Chart {
+export abstract class Chart implements CustomIssuePreparation {
   readonly id: string;
 
   protected readonly options: Dictionary<any>;
 
   protected readonly helper: ChartHelper;
-
-  protected readonly customPreparation?: CustomIssuePreparation = undefined;
 
   constructor(options: Dictionary<any> = {}) {
     this.id = options.id || GeneralHelper.makeId();
@@ -60,8 +58,12 @@ export abstract class Chart {
     return [];
   }
 
+  filter(issue: Issue): boolean {
+    return true;
+  }
+
   buildConfig(issues: Issue[]): Dictionary<any> {
-    const grouped = this.helper.prepareIssues(issues, this.customPreparation);
+    const grouped = this.helper.prepareIssues(issues, this);
 
     const groupedValues = this.helper.reduce(grouped, this.getStateIds());
 
@@ -103,7 +105,7 @@ export class ChartSite {
   }
 }
 
-export abstract  class Project {
+export abstract class Project {
   abstract readonly name: string;
   abstract readonly jql: string;
   abstract readonly fields: string[];
