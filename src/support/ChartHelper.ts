@@ -2,30 +2,10 @@ import * as stats from 'simple-statistics';
 import * as _ from 'lodash';
 
 import { Dictionary } from './Types';
-import { DateHelper } from './DateHelper';
+import { DateHelper, PERIOD_DAY } from './DateHelper';
 import { Issue } from '../model/Issue';
 import { GeneralHelper } from './GeneralHelper';
 import { ChartConfig } from '../model/ChartConfig';
-
-export const PERIOD_SECOND = 1000;
-
-export const PERIOD_MINUTE = PERIOD_SECOND * 60;
-
-export const PERIOD_HOUR = PERIOD_MINUTE * 60;
-
-export const PERIOD_DAY = PERIOD_HOUR * 24;
-
-export const PERIOD_WEEK = PERIOD_DAY * 7;
-
-export const PERIOD_MONTH = PERIOD_DAY * 30;
-
-export const PERIOD_QUARTER_ONE = PERIOD_MONTH * 3;
-
-export const PERIOD_QUARTER_TWO = PERIOD_MONTH * 6;
-
-export const PERIOD_QUARTER_THREE = PERIOD_MONTH * 9;
-
-export const PERIOD_YEAR = PERIOD_MONTH * 12;
 
 export const COLOR_SCHEMES: Dictionary<string[]> = (() => {
   const result: Dictionary<string[]> = {};
@@ -111,9 +91,9 @@ export interface CustomIssuePreparation {
 
 const Color = require('color');
 
-export const LABELTYPE_WEEK = 'week';
-export const LABELTYPE_MONTH = 'month';
-export const LABELTYPE_YEAR = 'year';
+export const PERIOD_LABEL_WEEK = 'week';
+export const PERIOD_LABEL_MONTH = 'month';
+export const PERIOD_LABEL_YEAR = 'year';
 
 export class ChartHelper {
   private readonly options: Dictionary<any>;
@@ -135,63 +115,70 @@ export class ChartHelper {
     return color;
   }
 
-  private getLabelType(): string {
-    return this.options.labelType || LABELTYPE_MONTH;
+  private getPeriodLabel(): string {
+    return this.options.periodLabel || PERIOD_LABEL_MONTH;
   }
 
   private firstOf(date: Date): Date {
-    const labelType = this.getLabelType();
+    const periodLabel = this.getPeriodLabel();
 
-    switch (labelType) {
-      case LABELTYPE_WEEK:
+    switch (periodLabel) {
+      case PERIOD_LABEL_WEEK:
         return DateHelper.firstOfWeek(date);
-      case LABELTYPE_MONTH:
+      case PERIOD_LABEL_MONTH:
         return DateHelper.firstOfMonth(date);
-      case LABELTYPE_YEAR:
+      case PERIOD_LABEL_YEAR:
         return DateHelper.firstOfYear(date);
       default:
-        throw new Error(`Unknown label type '${labelType}'!`);
+        throw new Error(`Unknown period label type '${periodLabel}'!`);
     }
   }
 
   private lastPeriod(date: Date): Date {
-    const labelType = this.getLabelType();
+    const periodLabel = this.getPeriodLabel();
 
-    switch (labelType) {
-      case LABELTYPE_WEEK:
+    switch (periodLabel) {
+      case PERIOD_LABEL_WEEK:
         return DateHelper.lastWeek(date);
-      case LABELTYPE_MONTH:
+      case PERIOD_LABEL_MONTH:
         return DateHelper.lastMonth(date);
-      case LABELTYPE_YEAR:
+      case PERIOD_LABEL_YEAR:
         return DateHelper.lastYear(date);
       default:
-        throw new Error(`Unknown label type '${labelType}'!`);
+        throw new Error(`Unknown period label type '${periodLabel}'!`);
     }
   }
 
   private getPeriodStart(time: number): number {
-    const labelType = this.getLabelType();
+    const periodLabel = this.getPeriodLabel();
 
-    switch (labelType) {
-      case LABELTYPE_WEEK:
+    switch (periodLabel) {
+      case PERIOD_LABEL_WEEK:
         return DateHelper.getWeekStart(time);
-      case LABELTYPE_MONTH:
+      case PERIOD_LABEL_MONTH:
         return DateHelper.getMonthStart(time);
-      case LABELTYPE_YEAR:
+      case PERIOD_LABEL_YEAR:
         return DateHelper.getYearStart(time);
       default:
-        throw new Error(`Unknown label type '${labelType}'!`);
+        throw new Error(`Unknown period label type '${periodLabel}'!`);
     }
   }
 
-  makeLabel(date: Date): string {
-    const localeString = this.options.localeString || 'en-GB';
+  private makeLabel(date: Date): string {
+    const periodLabel = this.getPeriodLabel();
 
-    const options: Dictionary<any> = {};
+    const format = this.options.labelFormat;
 
-    options[this.getLabelType()] = this.options.labelFormat || 'long';
-
-    return date.toLocaleString(localeString, options);
+    switch (periodLabel) {
+      case PERIOD_LABEL_WEEK:
+        return DateHelper.format(date, format || 'ww');
+      case PERIOD_LABEL_MONTH:
+        return DateHelper.format(date, format || 'MMMM');
+      case PERIOD_LABEL_YEAR:
+        return DateHelper.format(date, format || 'YYYY');
+      default:
+        throw new Error(`Unknown label type '${periodLabel}'!`);
+    }
   }
 
   makeLabels(amount: number, inputDate: Date = new Date()): string[] {
@@ -246,30 +233,17 @@ export class ChartHelper {
     return _.groupBy(filtered, cbGroup);
   }
 
-  reduceByStates(grouped: Dictionary<Issue[]>, stateIds: any[]): number[][] {
-    const reducer: (group: Issue[]) => number[] = stateIds.length ? (
-      group => {
-        return group.map((issue: Issue) => {
-          let duration = 0;
+  reduceByStates(issue: Issue, stateIds: any[]): number {
+    if (!stateIds.length) return Math.round(issue.duration / PERIOD_DAY);
 
-          for (const stateId of stateIds) {
-            // @ts-ignore
-            duration += issue.states[stateId.toString()]?.duration || 0;
-          }
+    let duration = 0;
 
-          return Math.round(duration / PERIOD_DAY);
-        });
-      }
-    ) : (
-      group => {
-        return group.map((issue: Issue) => {
-          // @ts-ignore
-          return Math.round(issue.duration / PERIOD_DAY);
-        });
-      }
-    );
+    for (const stateId of stateIds) {
+      // @ts-ignore
+      duration += issue.states[stateId.toString()]?.duration || 0;
+    }
 
-    return Object.values(grouped).map(reducer);
+    return Math.round(duration / PERIOD_DAY);
   }
 
   makeOverviewChartConfig(labels: string[], groupedValues: number[][]): ChartConfig {

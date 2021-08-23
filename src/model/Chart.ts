@@ -11,10 +11,16 @@ export abstract class Chart implements CustomIssuePreparation {
 
   protected readonly helper: ChartHelper;
 
+  protected customizeOptions(): void {
+    // Overwrite this on inherited classes if needed
+  }
+
   constructor(options: Dictionary<any> = {}) {
     this.id = options.id || GeneralHelper.makeId();
     this.options = options;
     this.helper = new ChartHelper(this.options);
+
+    this.customizeOptions();
   }
 
   protected getChartType(): string {
@@ -40,10 +46,6 @@ export abstract class Chart implements CustomIssuePreparation {
     };
   }
 
-  protected reduce(grouped: Dictionary<Issue[]>): number[][] {
-    return this.helper.reduceByStates(grouped, this.options.stateIds || []);
-  }
-
   filter(issue: Issue): boolean {
     return true;
   }
@@ -52,19 +54,25 @@ export abstract class Chart implements CustomIssuePreparation {
     return this.helper.prepareIssues(issues, this);
   }
 
-  protected makeChartConfig(groupedValues: number[][]): ChartConfig {
+  protected makeChartConfig(grouped: Dictionary<Issue[]>): ChartConfig {
+    const stateIds = this.options.stateIds || [];
+
+    const datasets = Object.values(grouped).map((group: Issue[]) => {
+      return group.map((issue: Issue) => {
+        return this.helper.reduceByStates(issue, stateIds);
+      });
+    });
+
     return this.helper.makeOverviewChartConfig(
-      this.helper.makeLabels(groupedValues.length),
-      groupedValues,
+      this.helper.makeLabels(datasets.length),
+      datasets,
     );
   }
 
   buildConfig(issues: Issue[]): Dictionary<any> {
     const grouped = this.prepareIssues(issues);
 
-    const groupedValues = this.reduce(grouped);
-
-    const chartConfig = this.makeChartConfig(groupedValues);
+    const chartConfig = this.makeChartConfig(grouped);
 
     const options = this.getOptions();
 

@@ -1,4 +1,24 @@
-import { PERIOD_DAY, PERIOD_WEEK } from './ChartHelper';
+import * as moment from 'moment';
+
+export const PERIOD_SECOND = 1000;
+
+export const PERIOD_MINUTE = PERIOD_SECOND * 60;
+
+export const PERIOD_HOUR = PERIOD_MINUTE * 60;
+
+export const PERIOD_DAY = PERIOD_HOUR * 24;
+
+export const PERIOD_WEEK = PERIOD_DAY * 7;
+
+export const PERIOD_MONTH = PERIOD_DAY * 30;
+
+export const PERIOD_QUARTER_ONE = PERIOD_MONTH * 3;
+
+export const PERIOD_QUARTER_TWO = PERIOD_MONTH * 6;
+
+export const PERIOD_QUARTER_THREE = PERIOD_MONTH * 9;
+
+export const PERIOD_YEAR = PERIOD_MONTH * 12;
 
 export abstract class DateHelper {
   static substract(date: Date, period: number): Date {
@@ -92,5 +112,10 @@ export abstract class DateHelper {
     const date = new Date(now - timePeriod);
 
     return this.firstOfYear(date).getTime();
+  }
+
+  // Checkout https://momentjs.com/docs/#/parsing/string-format/
+  static format(date: Date, format: string) {
+    return moment(date).format(format);
   }
 }
