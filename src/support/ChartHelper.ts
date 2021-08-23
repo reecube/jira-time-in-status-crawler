@@ -220,30 +220,40 @@ export class ChartHelper {
   }
 
   makeOverviewChartConfig(labels: string[], groupedValues: number[][]): ChartConfig {
+    let color: string;
+
     const datasets = [];
 
+    color = this.nextColor();
     datasets.push({
       label: '50% Quantile (days)',
       data: groupedValues.map((it: number[]) => stats.quantile(it, 0.5)),
-      backgroundColor: this.nextColor(),
+      backgroundColor: color,
+      borderColor: color,
     });
 
+    color = this.nextColor();
     datasets.push({
       label: '70% Quantile (days)',
       data: groupedValues.map((it: number[]) => stats.quantile(it, 0.7)),
-      backgroundColor: this.nextColor(),
+      backgroundColor: color,
+      borderColor: color,
     });
 
+    color = this.nextColor();
     datasets.push({
       label: 'Average (days)',
       data: groupedValues.map((it: number[]) => stats.average(it)),
-      backgroundColor: this.nextColor(),
+      backgroundColor: color,
+      borderColor: color,
     });
 
+    color = this.nextColor();
     datasets.push({
       label: 'Standard deviation (days)',
       data: groupedValues.map((it: number[]) => stats.standardDeviation(it)),
-      backgroundColor: this.nextColor(),
+      backgroundColor: color,
+      borderColor: color,
     });
 
     return {
