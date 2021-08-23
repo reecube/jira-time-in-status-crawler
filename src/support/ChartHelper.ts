@@ -109,6 +109,8 @@ export interface CustomIssuePreparation {
   group?: (issue: Issue) => any;
 }
 
+const Color = require('color');
+
 export class ChartHelper {
   private readonly options: Dictionary<any>;
 
@@ -266,7 +268,11 @@ export class ChartHelper {
     const ref = GeneralHelper.getReferenceByPath('plugins.annotation.annotations', options);
 
     for (const dataset of chartConfig.datasets) {
-      const color = dataset.backgroundColor || dataset.borderColor || dataset.color;
+      const originalColor = dataset.borderColor || dataset.backgroundColor || dataset.color || '#666';
+
+      const color = new Color(originalColor)
+        .alpha(0.5)
+        .string();
 
       let counter = 0;
       const lr = stats.linearRegression(dataset.data.map((y: number) => [counter++, y]));
