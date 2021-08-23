@@ -171,7 +171,7 @@ export class ChartHelper {
 
     switch (periodLabel) {
       case PERIOD_LABEL_WEEK:
-        return DateHelper.format(date, format || 'ww');
+        return 'CW' + DateHelper.format(date, format || 'ww');
       case PERIOD_LABEL_MONTH:
         return DateHelper.format(date, format || 'MMMM');
       case PERIOD_LABEL_YEAR:
