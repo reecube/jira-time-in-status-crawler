@@ -193,7 +193,7 @@ export class ChartHelper {
     return _.groupBy(filtered, cbGroup);
   }
 
-  reduce(grouped: Dictionary<Issue[]>, stateIds: any[]) {
+  reduce(grouped: Dictionary<Issue[]>, stateIds: any[]): number[][] {
     const reducer: (group: Issue[]) => number[] = stateIds.length ? (
       group => {
         return group.map((issue: Issue) => {

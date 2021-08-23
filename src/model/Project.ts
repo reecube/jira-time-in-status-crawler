@@ -58,19 +58,31 @@ export abstract class Chart implements CustomIssuePreparation {
     return [];
   }
 
+  protected reduce(grouped: Dictionary<Issue[]>): number[][] {
+    return this.helper.reduce(grouped, this.getStateIds());
+  }
+
   filter(issue: Issue): boolean {
     return true;
   }
 
-  buildConfig(issues: Issue[]): Dictionary<any> {
-    const grouped = this.helper.prepareIssues(issues, this);
+  protected prepareIssues(issues: Issue[]): Dictionary<Issue[]> {
+    return this.helper.prepareIssues(issues, this);
+  }
 
-    const groupedValues = this.helper.reduce(grouped, this.getStateIds());
-
-    const chartConfig = this.helper.makeOverviewChartConfig(
+  protected makeChartConfig(groupedValues: number[][]): ChartConfig {
+    return this.helper.makeOverviewChartConfig(
       this.helper.makeMonthLabels(groupedValues.length),
       groupedValues,
     );
+  }
+
+  buildConfig(issues: Issue[]): Dictionary<any> {
+    const grouped = this.prepareIssues(issues);
+
+    const groupedValues = this.reduce(grouped);
+
+    const chartConfig = this.makeChartConfig(groupedValues);
 
     const options = this.getOptions();
 
