@@ -45,6 +45,10 @@ export abstract class GeneralHelper {
   }
 
   static recursiveMerge(a: any, b: any): any {
+    if (typeof a === 'undefined') return b;
+
+    if (typeof b === 'undefined') return a;
+
     if (typeof b !== 'object' || typeof a !== 'object') return b;
 
     if (Array.isArray(a) && Array.isArray(b)) return [
