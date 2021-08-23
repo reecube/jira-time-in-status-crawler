@@ -111,6 +111,10 @@ export interface CustomIssuePreparation {
 
 const Color = require('color');
 
+export const LABELTYPE_WEEK = 'week';
+export const LABELTYPE_MONTH = 'month';
+export const LABELTYPE_YEAR = 'year';
+
 export class ChartHelper {
   private readonly options: Dictionary<any>;
 
@@ -131,27 +135,74 @@ export class ChartHelper {
     return color;
   }
 
+  private getLabelType(): string {
+    return this.options.labelType || LABELTYPE_MONTH;
+  }
+
+  private firstOf(date: Date): Date {
+    const labelType = this.getLabelType();
+
+    switch (labelType) {
+      case LABELTYPE_WEEK:
+        return DateHelper.firstOfWeek(date);
+      case LABELTYPE_MONTH:
+        return DateHelper.firstOfMonth(date);
+      case LABELTYPE_YEAR:
+        return DateHelper.firstOfYear(date);
+      default:
+        throw new Error(`Unknown label type '${labelType}'!`);
+    }
+  }
+
+  private lastPeriod(date: Date): Date {
+    const labelType = this.getLabelType();
+
+    switch (labelType) {
+      case LABELTYPE_WEEK:
+        return DateHelper.lastWeek(date);
+      case LABELTYPE_MONTH:
+        return DateHelper.lastMonth(date);
+      case LABELTYPE_YEAR:
+        return DateHelper.lastYear(date);
+      default:
+        throw new Error(`Unknown label type '${labelType}'!`);
+    }
+  }
+
+  private getPeriodStart(time: number): number {
+    const labelType = this.getLabelType();
+
+    switch (labelType) {
+      case LABELTYPE_WEEK:
+        return DateHelper.getWeekStart(time);
+      case LABELTYPE_MONTH:
+        return DateHelper.getMonthStart(time);
+      case LABELTYPE_YEAR:
+        return DateHelper.getYearStart(time);
+      default:
+        throw new Error(`Unknown label type '${labelType}'!`);
+    }
+  }
+
   makeLabel(date: Date): string {
     const localeString = this.options.localeString || 'en-GB';
 
     const options: Dictionary<any> = {};
 
-    options[this.options.labelType || 'month'] = this.options.labelFormat || 'long';
+    options[this.getLabelType()] = this.options.labelFormat || 'long';
 
     return date.toLocaleString(localeString, options);
   }
 
-  makeMonthLabels(amount: number, inputDate: Date = new Date()): string[] {
+  makeLabels(amount: number, inputDate: Date = new Date()): string[] {
     const labels: string[] = [];
 
-    let date = new Date(inputDate);
-
-    date.setDate(1);
+    let date: Date = this.firstOf(inputDate);
 
     for (let i = 0; i < amount; i++) {
       labels.push(this.makeLabel(date));
 
-      date = DateHelper.lastMonth(date);
+      date = this.lastPeriod(date);
     }
 
     return labels.reverse();
@@ -165,7 +216,7 @@ export class ChartHelper {
 
     const timePeriod = days * PERIOD_DAY;
 
-    const firstValidDate = DateHelper.getMonthStart(timePeriod);
+    const firstValidDate = this.getPeriodStart(timePeriod);
 
     const filtered = issues.filter((issue) => {
       if (!issue.resolved) return false;
@@ -195,7 +246,7 @@ export class ChartHelper {
     return _.groupBy(filtered, cbGroup);
   }
 
-  reduce(grouped: Dictionary<Issue[]>, stateIds: any[]): number[][] {
+  reduceByStates(grouped: Dictionary<Issue[]>, stateIds: any[]): number[][] {
     const reducer: (group: Issue[]) => number[] = stateIds.length ? (
       group => {
         return group.map((issue: Issue) => {

@@ -43,4 +43,24 @@ export abstract class GeneralHelper {
 
     return this.getReferenceByPath(path, input[key]);
   }
+
+  static recursiveMerge(a: any, b: any): any {
+    if (typeof b !== 'object' || typeof a !== 'object') return b;
+
+    if (Array.isArray(a) && Array.isArray(b)) return [
+      ...a,
+      ...b,
+    ];
+
+    const result: Dictionary<any> = {
+      ...a,
+      ...b,
+    };
+
+    for (const key of Object.keys(result)) {
+      result[key] = this.recursiveMerge(a[key], b[key]);
+    }
+
+    return result;
+  }
 }

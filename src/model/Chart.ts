@@ -41,7 +41,7 @@ export abstract class Chart implements CustomIssuePreparation {
   }
 
   protected reduce(grouped: Dictionary<Issue[]>): number[][] {
-    return this.helper.reduce(grouped, this.options.stateIds || []);
+    return this.helper.reduceByStates(grouped, this.options.stateIds || []);
   }
 
   filter(issue: Issue): boolean {
@@ -54,7 +54,7 @@ export abstract class Chart implements CustomIssuePreparation {
 
   protected makeChartConfig(groupedValues: number[][]): ChartConfig {
     return this.helper.makeOverviewChartConfig(
-      this.helper.makeMonthLabels(groupedValues.length),
+      this.helper.makeLabels(groupedValues.length),
       groupedValues,
     );
   }
