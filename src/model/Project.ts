@@ -54,12 +54,8 @@ export abstract class Chart implements CustomIssuePreparation {
     };
   }
 
-  protected getStateIds(): any[] {
-    return [];
-  }
-
   protected reduce(grouped: Dictionary<Issue[]>): number[][] {
-    return this.helper.reduce(grouped, this.getStateIds());
+    return this.helper.reduce(grouped, this.options.stateIds || []);
   }
 
   filter(issue: Issue): boolean {

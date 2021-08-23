@@ -1,4 +1,5 @@
 import { Dictionary } from './Types';
+import { IssueReference } from '../model/Issue';
 
 const CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -17,7 +18,7 @@ export abstract class GeneralHelper {
     return result.join('');
   }
 
-  static addToCollection(ref: any, collection: Dictionary<string>) {
+  static addToCollection(ref: IssueReference | IssueReference[], collection: Dictionary<string>) {
     if (!ref) return;
 
     if (!Array.isArray(ref)) {

@@ -16,9 +16,7 @@ export interface IssueStatusChange {
   toString: string;
 }
 
-export interface IssueStatus {
-  id: string
-  name: string
+export interface IssueStatus extends IssueReference {
   duration: number,
   firstTransition: Date
   lastTransition: Date

@@ -15,10 +15,16 @@ export class ReportChart extends BaseReport {
 
     const options = {
       states: {},
+      types: {},
+      priorities: {},
+      resolutions: {},
     };
 
     for (const issue of localIssues) {
       GeneralHelper.addToCollection(Object.values(issue.states), options.states);
+      GeneralHelper.addToCollection(issue.type, options.types);
+      GeneralHelper.addToCollection(issue.priority, options.priorities);
+      if (issue.resolution) GeneralHelper.addToCollection(issue.resolution, options.resolutions);
     }
 
     const chartSites = this.context.project.buildChartSites(localIssues, options);
