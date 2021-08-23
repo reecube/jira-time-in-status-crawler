@@ -3,9 +3,9 @@ import * as _ from 'lodash';
 
 import { Dictionary } from './Types';
 import { DateHelper } from './DateHelper';
-import { ChartConfig } from '../model/Project';
 import { Issue } from '../model/Issue';
 import { GeneralHelper } from './GeneralHelper';
+import { ChartConfig } from '../model/ChartConfig';
 
 export const PERIOD_SECOND = 1000;
 
