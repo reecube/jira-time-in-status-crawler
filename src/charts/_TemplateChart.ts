@@ -1,4 +1,4 @@
-import { Chart } from '../model/Project';
+import { Chart } from '../model/Chart';
 
 export class _TemplateChart extends Chart {
 

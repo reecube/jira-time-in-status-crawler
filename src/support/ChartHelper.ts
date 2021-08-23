@@ -289,6 +289,22 @@ export class ChartHelper {
     };
   }
 
+  getStackedOptions(options: Dictionary<any>): Dictionary<any> {
+    return GeneralHelper.recursiveMerge(options, {
+      interaction: {
+        intersect: false,
+      },
+      scales: {
+        x: {
+          stacked: true,
+        },
+        y: {
+          stacked: true,
+        },
+      },
+    });
+  }
+
   addAnnotations(options: Dictionary<any>, chartConfig: ChartConfig): void {
     const ref = GeneralHelper.getReferenceByPath('plugins.annotation.annotations', options);
 

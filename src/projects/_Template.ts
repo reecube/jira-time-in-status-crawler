@@ -1,7 +1,8 @@
-import { ChartSite, ResponseIssue, Project, PROJECT_VALUE_DEFAULT, Row, CustomIssue } from '../model/Project';
+import { ResponseIssue, Project, PROJECT_VALUE_DEFAULT, Row, CustomIssue } from '../model/Project';
 import { Issue } from '../model/Issue';
 import { _TemplateChart } from '../charts/_TemplateChart';
 import { Dictionary } from '../support/Types';
+import { ChartSite } from '../model/ChartSite';
 
 export class _Template extends Project {
   name = 'TODO';
