@@ -76,7 +76,8 @@ export abstract class Chart implements CustomIssuePreparation {
 
     const options = this.getOptions();
 
-    this.helper.addAnnotations(options, chartConfig);
+    if (this.options.showAnnotations ?? true)
+      this.helper.addAnnotations(options, chartConfig);
 
     return {
       type: this.getChartType(),
