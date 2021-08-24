@@ -195,32 +195,39 @@ export class ChartHelper {
     return labels.reverse();
   }
 
-  prepareIssues(
+  filterTimeRange(
     issues: Issue[],
-    custom: CustomIssuePreparation,
-  ): Dictionary<Issue[]> {
+    filter?: (issue: Issue) => boolean,
+  ): Issue[] {
     const days = this.options.days || 180;
 
     const timePeriod = days * PERIOD_DAY;
 
     const firstValidDate = this.getPeriodStart(timePeriod);
 
-    const filtered = issues.filter((issue) => {
+    return issues.filter((issue) => {
       if (!issue.resolved) return false;
 
       if (issue.resolved.getTime() < firstValidDate) return false;
 
-      if (!custom.filter) return true;
+      if (!filter) return true;
 
-      return custom.filter(issue);
-    }).sort((a, b) => {
+      return filter(issue);
+    });
+  }
+
+  prepareIssues(
+    issues: Issue[],
+    custom: CustomIssuePreparation,
+  ): Dictionary<Issue[]> {
+    const sorted = issues.sort((a, b) => {
       if (custom.sort) return custom.sort(a, b);
 
       // @ts-ignore
       return a?.resolved?.getTime() - b?.resolved?.getTime();
     });
 
-    if (!filtered.length) {
+    if (!sorted.length) {
       console.warn(new Error(`Empty issue list after filter`));
 
       return {};
@@ -230,7 +237,7 @@ export class ChartHelper {
       (issue: Issue) => issue.resolved?.getMonth()
     );
 
-    return _.groupBy(filtered, cbGroup);
+    return _.groupBy(sorted, cbGroup);
   }
 
   reduceByStates(issue: Issue, stateIds: any[]): number {
@@ -285,6 +292,26 @@ export class ChartHelper {
 
     return {
       labels,
+      datasets,
+    };
+  }
+
+  makeGroupedChartConfig(labels: string[], aggregated: Dictionary<number[][]>): ChartConfig {
+    const datasets = [];
+
+    for (const [group, weeks] of Object.entries<number[][]>(aggregated)) {
+      const color = this.nextColor();
+
+      datasets.push({
+        label: group,
+        data: Object.values(weeks).map(stats.sum),
+        backgroundColor: color,
+        borderColor: color,
+      });
+    }
+
+    return {
+      labels: this.makeLabels(datasets[0].data.length),
       datasets,
     };
   }

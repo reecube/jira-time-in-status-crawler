@@ -3,6 +3,7 @@ import { Dictionary } from '../support/Types';
 import { GeneralHelper } from '../support/GeneralHelper';
 import { Issue } from './Issue';
 import { ChartConfig } from './ChartConfig';
+import { PERIOD_DAY } from '../support/DateHelper';
 
 export abstract class Chart implements CustomIssuePreparation {
   readonly id: string;
@@ -50,6 +51,13 @@ export abstract class Chart implements CustomIssuePreparation {
     return true;
   }
 
+  protected filterTimeRange(issues: Issue[]): Issue[] {
+    return this.helper.filterTimeRange(
+      issues,
+      this.filter.bind(this)
+    );
+  }
+
   protected prepareIssues(issues: Issue[]): Dictionary<Issue[]> {
     return this.helper.prepareIssues(issues, this);
   }
@@ -70,7 +78,9 @@ export abstract class Chart implements CustomIssuePreparation {
   }
 
   buildConfig(issues: Issue[]): Dictionary<any> {
-    const grouped = this.prepareIssues(issues);
+    const filteredIssues = this.filterTimeRange(issues);
+
+    const grouped = this.prepareIssues(filteredIssues);
 
     const chartConfig = this.makeChartConfig(grouped);
 
