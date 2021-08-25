@@ -182,9 +182,17 @@ export class ChartHelper {
   }
 
   makeGroupLabel(date: Date): string {
+    const periodLabel = this.getPeriodLabel();
+
     const format = this.getPeriodFormat(false);
 
-    return DateHelper.format(date, format);
+    const formatted = DateHelper.format(date, format);
+
+    const labelPrefix = this.options.labelPrefix ??
+      (periodLabel === PERIOD_LABEL_WEEK ? 'CW ' : '');
+    const labelPostfix = this.options.labelPostfix ?? '';
+
+    return `${labelPrefix}${formatted}${labelPostfix}`;
   }
 
   makeGroupLabels(): string[] {
