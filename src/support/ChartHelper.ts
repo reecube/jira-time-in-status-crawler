@@ -53,7 +53,7 @@ export const COLOR_SCHEMES: Dictionary<string[]> = (() => {
   ];
 
   result.rainbow = getColors(rainbowColors, '500');
-  result.rainbowreversed = getColors(rainbowColors.reverse(), '500');
+  result.rainbowReversed = getColors(rainbowColors.reverse(), '500');
   result.smooth = getColors([
     'blue',
     'cyan',
