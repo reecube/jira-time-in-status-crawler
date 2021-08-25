@@ -50,9 +50,14 @@ export abstract class Chart implements CustomIssuePreparation {
     return true;
   }
 
+  protected mapIssueDate(issue: Issue): Date {
+    return issue.resolved;
+  }
+
   protected filterTimeRange(issues: Issue[]): Issue[] {
     return this.helper.filterTimeRange(
       issues,
+      this.mapIssueDate.bind(this),
       this.filter.bind(this)
     );
   }

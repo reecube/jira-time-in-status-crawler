@@ -217,7 +217,8 @@ export class ChartHelper {
 
   filterTimeRange(
     issues: Issue[],
-    filter?: (issue: Issue) => boolean,
+    mapDate: (issue: Issue) => Date,
+    filter: (issue: Issue) => boolean,
   ): Issue[] {
     const days = this.options.days || DEFAULT_DAYS;
 
@@ -226,9 +227,11 @@ export class ChartHelper {
     const firstValidDate = this.getPeriodStart(timePeriod);
 
     return issues.filter((issue) => {
-      if (!issue.resolved) return false;
+      const date = mapDate(issue);
 
-      if (issue.resolved.getTime() < firstValidDate) return false;
+      if (!date) return false;
+
+      if (date.getTime() < firstValidDate) return false;
 
       if (!filter) return true;
 
@@ -369,8 +372,8 @@ export class ChartHelper {
       ref[GeneralHelper.makeId()] = {
         drawTime: 'beforeDraw',
         type: 'line',
-        yMin: Math.max(0, lrl(0)),
-        yMax: Math.max(0, lrl(dataset.data.length - 1)),
+        yMin: lrl(0),
+        yMax: lrl(dataset.data.length - 1),
         borderColor: color,
         borderWidth: 1,
       };
