@@ -95,6 +95,8 @@ export const PERIOD_LABEL_WEEK = 'week';
 export const PERIOD_LABEL_MONTH = 'month';
 export const PERIOD_LABEL_YEAR = 'year';
 
+const DEFAULT_DAYS = 180;
+
 export class ChartHelper {
   private readonly options: Dictionary<any>;
 
@@ -164,32 +166,42 @@ export class ChartHelper {
     }
   }
 
-  private makeLabel(date: Date): string {
+  private getPeriodFormat(short: boolean): string {
     const periodLabel = this.getPeriodLabel();
-
-    const format = this.options.labelFormat;
 
     switch (periodLabel) {
       case PERIOD_LABEL_WEEK:
-        return 'CW' + DateHelper.format(date, format || 'ww');
+        return 'WW';
       case PERIOD_LABEL_MONTH:
-        return DateHelper.format(date, format || 'MMMM');
+        return short ? 'MM' : 'MMMM';
       case PERIOD_LABEL_YEAR:
-        return DateHelper.format(date, format || 'YYYY');
+        return 'YYYY';
       default:
         throw new Error(`Unknown label type '${periodLabel}'!`);
     }
   }
 
-  makeLabels(amount: number, inputDate: Date = new Date()): string[] {
-    const labels: string[] = [];
+  makeGroupLabel(date: Date): string {
+    const format = this.getPeriodFormat(false);
 
-    let date: Date = this.firstOf(inputDate);
+    return DateHelper.format(date, format);
+  }
 
-    for (let i = 0; i < amount; i++) {
-      labels.push(this.makeLabel(date));
+  makeGroupLabels(): string[] {
+    const days = this.options.days || DEFAULT_DAYS;
 
-      date = this.lastPeriod(date);
+    const timePeriod = days * PERIOD_DAY;
+
+    const firstValidDate = this.getPeriodStart(timePeriod);
+
+    const labels = [];
+
+    let time = new Date();
+
+    while (time.getTime() > firstValidDate) {
+      labels.push(this.makeGroupLabel(time));
+
+      time = this.lastPeriod(time);
     }
 
     return labels.reverse();
@@ -199,7 +211,7 @@ export class ChartHelper {
     issues: Issue[],
     filter?: (issue: Issue) => boolean,
   ): Issue[] {
-    const days = this.options.days || 180;
+    const days = this.options.days || DEFAULT_DAYS;
 
     const timePeriod = days * PERIOD_DAY;
 
@@ -234,7 +246,7 @@ export class ChartHelper {
     }
 
     const cbGroup = custom.group || (
-      (issue: Issue) => issue.resolved?.getMonth()
+      (issue: Issue) => this.makeGroupLabel(issue.resolved)
     );
 
     return _.groupBy(sorted, cbGroup);
@@ -261,7 +273,7 @@ export class ChartHelper {
     color = this.nextColor();
     datasets.push({
       label: '50% Quantile (days)',
-      data: groupedValues.map((it: number[]) => stats.quantile(it, 0.5)),
+      data: groupedValues.map(it => !it.length ? 0 : stats.quantile(it, 0.5)),
       backgroundColor: color,
       borderColor: color,
     });
@@ -269,7 +281,7 @@ export class ChartHelper {
     color = this.nextColor();
     datasets.push({
       label: '70% Quantile (days)',
-      data: groupedValues.map((it: number[]) => stats.quantile(it, 0.7)),
+      data: groupedValues.map(it => !it.length ? 0 : stats.quantile(it, 0.7)),
       backgroundColor: color,
       borderColor: color,
     });
@@ -277,7 +289,7 @@ export class ChartHelper {
     color = this.nextColor();
     datasets.push({
       label: 'Average (days)',
-      data: groupedValues.map((it: number[]) => stats.average(it)),
+      data: groupedValues.map(it => !it.length ? 0 : stats.average(it)),
       backgroundColor: color,
       borderColor: color,
     });
@@ -285,7 +297,7 @@ export class ChartHelper {
     color = this.nextColor();
     datasets.push({
       label: 'Standard deviation (days)',
-      data: groupedValues.map((it: number[]) => stats.standardDeviation(it)),
+      data: groupedValues.map(it => !it.length ? 0 : stats.standardDeviation(it)),
       backgroundColor: color,
       borderColor: color,
     });
@@ -311,7 +323,7 @@ export class ChartHelper {
     }
 
     return {
-      labels: this.makeLabels(datasets[0].data.length),
+      labels,
       datasets,
     };
   }

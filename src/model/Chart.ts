@@ -3,7 +3,6 @@ import { Dictionary } from '../support/Types';
 import { GeneralHelper } from '../support/GeneralHelper';
 import { Issue } from './Issue';
 import { ChartConfig } from './ChartConfig';
-import { PERIOD_DAY } from '../support/DateHelper';
 
 export abstract class Chart implements CustomIssuePreparation {
   readonly id: string;
@@ -63,16 +62,20 @@ export abstract class Chart implements CustomIssuePreparation {
   }
 
   protected makeChartConfig(grouped: Dictionary<Issue[]>): ChartConfig {
+    const labels = this.helper.makeGroupLabels();
+
     const stateIds = this.options.stateIds || [];
 
-    const datasets = Object.values(grouped).map((group: Issue[]) => {
-      return group.map((issue: Issue) => {
+    const datasets =  labels.map((groupLabel): number[] => {
+      const values = grouped[groupLabel] ?? [];
+
+      return values.map((issue: Issue) => {
         return this.helper.reduceByStates(issue, stateIds);
       });
     });
 
     return this.helper.makeOverviewChartConfig(
-      this.helper.makeLabels(datasets.length),
+      labels,
       datasets,
     );
   }

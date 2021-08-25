@@ -67,4 +67,8 @@ export abstract class GeneralHelper {
 
     return result;
   }
+
+  static listOf<Type>(length: number, initial: Type = undefined): Type[] {
+    return new Array(length).fill(initial);
+  }
 }
