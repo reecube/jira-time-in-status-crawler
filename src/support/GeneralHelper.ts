@@ -1,3 +1,5 @@
+import * as _ from 'lodash';
+
 import { Dictionary } from './Types';
 import { IssueReference } from '../model/Issue';
 
@@ -70,5 +72,25 @@ export abstract class GeneralHelper {
 
   static listOf<Type>(length: number, initial: Type = undefined): Type[] {
     return new Array(length).fill(initial);
+  }
+
+  static groupByList<Type>(
+    list: Type[],
+    makeList: (Type) => string[],
+  ): Dictionary<Type[]> {
+    const newList: { key: string, value: Type }[] = _.flatten(list.map(entry => {
+      return makeList(entry).map(key => {
+        return {
+          key,
+          value: entry,
+        }
+      });
+    }));
+
+    const grouped = _.groupBy(newList, entry => {
+      return entry.key;
+    });
+
+    return _.mapValues(grouped, entries => entries.map(it => it.value));
   }
 }
