@@ -32,7 +32,7 @@ export abstract class Chart implements CustomIssuePreparation {
   }
 
   protected getOptions(): Dictionary<any> {
-    const title = this.getTitle();
+    const title = this.options.title ?? this.getTitle();
 
     return {
       responsive: false,
@@ -98,7 +98,7 @@ export abstract class Chart implements CustomIssuePreparation {
       this.helper.addAnnotations(options, chartConfig);
 
     return {
-      type: this.getChartType(),
+      type: this.options.chartType ?? this.getChartType(),
       data: chartConfig,
       options: options,
     };
