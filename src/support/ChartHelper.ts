@@ -271,7 +271,7 @@ export class ChartHelper {
     });
 
     if (!sorted.length) {
-      console.warn(new Error(`Empty issue list after filter`));
+      console.warn(`WARN: Empty issue list after filter`);
 
       return {};
     }
