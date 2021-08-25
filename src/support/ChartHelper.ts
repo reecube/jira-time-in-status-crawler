@@ -77,7 +77,27 @@ export const COLOR_SCHEMES: Dictionary<string[]> = (() => {
     'blue',
     'green',
     'amber',
+    'orange',
     'red',
+  ], '500');
+  result.quality = getColors([
+    'red',
+    'green',
+  ], '500');
+  result.priorities = getColors([
+    'red',
+    'deepOrange',
+    'orange',
+    'amber',
+    'yellow',
+    'lime',
+    'lightGreen',
+    'green',
+    'teal',
+    'cyan',
+    'lightBlue',
+    'blue',
+    'indigo',
   ], '500');
 
   return result;

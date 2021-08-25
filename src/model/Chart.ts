@@ -16,11 +16,12 @@ export abstract class Chart implements CustomIssuePreparation {
   }
 
   constructor(options: Dictionary<any> = {}) {
-    this.id = options.id || GeneralHelper.makeId();
     this.options = options;
-    this.helper = new ChartHelper(this.options);
 
     this.customizeOptions();
+
+    this.id = this.options.id || GeneralHelper.makeId();
+    this.helper = new ChartHelper(this.options);
   }
 
   protected getChartType(): string {
