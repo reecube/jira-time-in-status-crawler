@@ -20,6 +20,11 @@ export abstract class GeneralHelper {
     return result.join('');
   }
 
+  static stripInvalidChars(input: string): string {
+    // Source: https://stackoverflow.com/a/20864946/3359418
+    return input.replace(/[^a-zA-Z0-9_\-]+/g, '');
+  }
+
   static addToCollection(ref: IssueReference | IssueReference[], collection: Dictionary<string>) {
     if (!ref) return;
 
@@ -83,7 +88,7 @@ export abstract class GeneralHelper {
         return {
           key,
           value: entry,
-        }
+        };
       });
     }));
 
