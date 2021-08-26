@@ -1,4 +1,4 @@
-import { Chart } from '../model/Chart';
+import { Chart, CHARTTYPE_BAR } from '../model/Chart';
 
 export class _TemplateChart extends Chart {
 
@@ -7,7 +7,7 @@ export class _TemplateChart extends Chart {
   }
 
   protected getChartType(): string {
-    return 'bar';
+    return CHARTTYPE_BAR;
   }
 
   protected getStateIds(): any[] {

@@ -6,6 +6,7 @@ import { DateHelper, PERIOD_DAY } from './DateHelper';
 import { Issue } from '../model/Issue';
 import { GeneralHelper } from './GeneralHelper';
 import { ChartConfig } from '../model/ChartConfig';
+import { CHARTTYPE_LINE } from '../model/Chart';
 
 export const COLOR_SCHEMES: Dictionary<string[]> = (() => {
   const result: Dictionary<string[]> = {};
@@ -139,21 +140,6 @@ export class ChartHelper {
 
   private getPeriodLabel(): string {
     return this.options.periodLabel || PERIOD_LABEL_MONTH;
-  }
-
-  private firstOf(date: Date): Date {
-    const periodLabel = this.getPeriodLabel();
-
-    switch (periodLabel) {
-      case PERIOD_LABEL_WEEK:
-        return DateHelper.firstOfWeek(date);
-      case PERIOD_LABEL_MONTH:
-        return DateHelper.firstOfMonth(date);
-      case PERIOD_LABEL_YEAR:
-        return DateHelper.firstOfYear(date);
-      default:
-        throw new Error(`Unknown period label type '${periodLabel}'!`);
-    }
   }
 
   private lastPeriod(date: Date): Date {
@@ -342,14 +328,39 @@ export class ChartHelper {
   makeGroupedChartConfig(labels: string[], aggregated: Dictionary<number[][]>): ChartConfig {
     const datasets = [];
 
-    for (const [group, weeks] of Object.entries<number[][]>(aggregated)) {
+    for (const [group, values] of Object.entries<number[][]>(aggregated)) {
       const color = this.nextColor();
 
       datasets.push({
         label: group,
-        data: Object.values(weeks).map(stats.sum),
+        data: Object.values(values).map(stats.sum),
         backgroundColor: color,
         borderColor: color,
+      });
+    }
+
+    return {
+      labels,
+      datasets,
+    };
+  }
+
+  makePieChartConfig(
+    labels: string[],
+    aggregated: Dictionary<number[]>,
+    colorCount: number,
+  ): ChartConfig {
+    const datasets = [];
+
+    const colors = GeneralHelper.listOf(colorCount).map(this.nextColor.bind(this));
+
+    for (const [group, values] of Object.entries(aggregated)) {
+      datasets.push({
+        label: group,
+        data: values,
+        backgroundColor: colors,
+        borderColor: '#111',
+        borderWidth: 1,
       });
     }
 
@@ -391,7 +402,7 @@ export class ChartHelper {
 
       ref[GeneralHelper.makeId()] = {
         drawTime: 'beforeDraw',
-        type: 'line',
+        type: CHARTTYPE_LINE,
         yMin: lrl(0),
         yMax: lrl(dataset.data.length - 1),
         borderColor: color,
@@ -414,7 +425,7 @@ export class ChartHelper {
 
       ref[GeneralHelper.makeId()] = {
         drawTime: 'afterDraw',
-        type: 'line',
+        type: CHARTTYPE_LINE,
         yMin: yMin,
         yMax: yMax,
         borderColor: backgroundColor,

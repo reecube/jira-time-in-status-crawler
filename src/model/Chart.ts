@@ -4,6 +4,33 @@ import { GeneralHelper } from '../support/GeneralHelper';
 import { Issue } from './Issue';
 import { ChartConfig } from './ChartConfig';
 
+export const CHARTTYPE_BAR = 'bar';
+export const CHARTTYPE_LINE = 'line';
+export const CHARTTYPE_BUBBLE = 'bubble';
+export const CHARTTYPE_SCATTER = 'scatter';
+export const CHARTTYPE_DOUGHNUT = 'doughnut';
+export const CHARTTYPE_PIE = 'pie';
+export const CHARTTYPE_POLAR_AREA = 'polarArea';
+export const CHARTTYPE_RADAR = 'radar';
+
+export const CHARTTYPES = [
+  CHARTTYPE_BAR,
+  CHARTTYPE_LINE,
+  CHARTTYPE_BUBBLE,
+  CHARTTYPE_SCATTER,
+  CHARTTYPE_DOUGHNUT,
+  CHARTTYPE_PIE,
+  CHARTTYPE_POLAR_AREA,
+  CHARTTYPE_RADAR,
+];
+
+export const ANNOTATED_CHARTTYPES = [
+  CHARTTYPE_BAR,
+  CHARTTYPE_LINE,
+  CHARTTYPE_BUBBLE,
+  CHARTTYPE_SCATTER,
+];
+
 export abstract class Chart implements CustomIssuePreparation {
   readonly id: string;
 
@@ -12,7 +39,8 @@ export abstract class Chart implements CustomIssuePreparation {
   protected readonly helper: ChartHelper;
 
   protected customizeOptions(): void {
-    // Overwrite this on inherited classes if needed
+    this.options.showAnnotations = this.options.showAnnotations
+      ?? ANNOTATED_CHARTTYPES.includes(this.getChartType());
   }
 
   constructor(options: Dictionary<any> = {}) {
@@ -25,7 +53,7 @@ export abstract class Chart implements CustomIssuePreparation {
   }
 
   protected getChartType(): string {
-    return 'line';
+    return CHARTTYPE_LINE;
   }
 
   protected getTitle(): string {
@@ -59,7 +87,7 @@ export abstract class Chart implements CustomIssuePreparation {
     return this.helper.filterTimeRange(
       issues,
       this.mapIssueDate.bind(this),
-      this.filter.bind(this)
+      this.filter.bind(this),
     );
   }
 
@@ -72,7 +100,7 @@ export abstract class Chart implements CustomIssuePreparation {
 
     const stateIds = this.options.stateIds || [];
 
-    const datasets =  labels.map((groupLabel): number[] => {
+    const datasets = labels.map((groupLabel): number[] => {
       const values = grouped[groupLabel] ?? [];
 
       return values.map((issue: Issue) => {
