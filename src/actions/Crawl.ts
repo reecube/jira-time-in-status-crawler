@@ -79,10 +79,10 @@ export class Crawl extends BaseAction {
             id: respIssue.fields.status.id,
             name: respIssue.fields.status.name,
           },
-          priority: {
+          priority: respIssue.fields.priority ? {
             id: respIssue.fields.priority.id,
             name: respIssue.fields.priority.name,
-          },
+          } : null,
           created: issueCreated,
           updated: issueUpdated,
           resolved: issueResolved,
